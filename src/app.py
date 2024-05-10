@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from src.database import SessionLocal, engine
+from src.database import engine, get_db
 from src import models
 
 models.Base.metadata.create_all(bind=engine)
@@ -10,14 +10,6 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 templates = Jinja2Templates(directory="src/templates")
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @app.get("/")
@@ -98,7 +90,7 @@ async def delete_snippet(snippet_id: int):
 
 @app.get("/test-db")
 async def test_db(db: Session = Depends(get_db)):
-    test_snippet = models.CodeSnippet(
+    test_snippet = models.Snippet(
         title="Test Snippet", language="Python", code="print('Hello, World!')"
     )
     db.add(test_snippet)
@@ -106,9 +98,7 @@ async def test_db(db: Session = Depends(get_db)):
     db.refresh(test_snippet)
 
     retrieved_snippet = (
-        db.query(models.CodeSnippet)
-        .filter(models.CodeSnippet.id == test_snippet.id)
-        .first()
+        db.query(models.Snippet).filter(models.Snippet.id == test_snippet.id).first()
     )
 
     return {

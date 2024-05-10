@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, declarative_base
 
-from src.database import Base
+Base = declarative_base()
 
 
-class CodeSnippet(Base):
+class Snippet(Base):
     __tablename__ = "snippets"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -30,7 +30,7 @@ class Feedback(Base):
     content = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
 
-    snippet = relationship("CodeSnippet", back_populates="feedbacks")
+    snippet = relationship("Snippet", back_populates="feedbacks")
 
 
 class Test(Base):
@@ -41,7 +41,7 @@ class Test(Base):
     test_code = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
 
-    snippet = relationship("CodeSnippet", back_populates="tests")
+    snippet = relationship("Snippet", back_populates="tests")
     results = relationship("TestResult", back_populates="test")
 
 
