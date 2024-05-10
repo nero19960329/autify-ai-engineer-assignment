@@ -108,10 +108,11 @@
         createBtn.addEventListener('click', createSnippet);
 
         async function deleteSnippet(id) {
-            await fetch(`/snippets/${id}`, {method: 'DELETE'});
-            snippets = snippets.filter(snippet => snippet.id !== id);
-            renderSnippetList(snippets);
-            renderSnippetDetail(snippets[0]);
+            const response = await fetch(`/snippets/${id}`, {method: 'DELETE'});
+            if (!response.ok) {
+                console.error('Failed to delete snippet:', response.status);
+            }
+            return response.ok;
         }
 
         async function fetchSnippetDetail(id) {
@@ -134,13 +135,15 @@
                 }
             } else if (e.target.matches('.delete-btn')) {
                 const snippetId = Number(e.target.dataset.id);
-                deleteSnippet(snippetId);
-                snippets = snippets.filter(snippet => snippet.id !== snippetId);
-                if (currentSnippetId === snippetId) {
-                    currentSnippetId = null;
-                    renderSnippetDetail(snippets[0]);
+                if (await deleteSnippet(snippetId)) {
+                    snippets = snippets.filter(snippet => snippet.id !== snippetId);
+                    if (currentSnippetId === snippetId) {
+                        currentSnippetId = null;
+                        renderSnippetDetail({title: '', language: '', code: '', tests: ''});
+                    }
+                    renderSnippetList(snippets);
+                    renderSnippetDetail(snippets[0] || {});
                 }
-                renderSnippetList(snippets);
             }
         });
 

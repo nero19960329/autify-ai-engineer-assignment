@@ -9,6 +9,12 @@ class SnippetCreate(BaseModel):
     code: str = ""
 
 
+class SnippetUpdate(BaseModel):
+    title: str | None = None
+    language: str | None = None
+    code: str | None = None
+
+
 class Snippet(SnippetCreate):
     model_config = ConfigDict(from_attributes=True)
 
