@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
+    <title>Code Snippet Generator</title>
+</head>
+
+<body>
+    <div class="flex">
+        <!-- Left Column for Snippets List -->
+        <div class="w-1/4 p-4 bg-gray-200">
+            <h2 class="font-bold mb-4">Snippets List</h2>
+            <button id="create-snippet-btn" class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">
+                Create New Snippet
+            </button>
+            <ul id="snippet-list"></ul>
+        </div>
+
+        <!-- Right Column for Editor and Controls -->
+        <div id="snippet-detail" class="w-1/2 p-4">
+            <h1 class="text-xl font-bold mb-4">Code Snippet Generator</h1>
+            <p>Select a snippet from the list to view details.</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        const createBtn = document.getElementById('create-snippet-btn');
+        const snippetList = document.getElementById('snippet-list');
+        const snippetDetail = document.getElementById('snippet-detail');
+
+        async function fetchSnippets() {
+            const response = await fetch('/snippets');
+            return await response.json();
+        }
+
+        let currentSnippetId = null;
+        
+        function renderSnippetList(snippets) {
+            snippetList.innerHTML = '';
+            snippets.forEach(snippet => {
+                const isSelected = snippet.id === currentSnippetId;
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a href="#" class="snippet-item w-full block p-2 rounded ${isSelected ? 'bg-gray-500 text-white' : 'bg-gray-300'}" data-id="${snippet.id}">
+                        ${snippet.title} | ${snippet.language}
+                    </a>
+                    ${!isSelected ? '<button class="delete-btn bg-red-500 text-white px-2 py-1 rounded" data-id="' + snippet.id + '">Delete</button>' : ''}
+                `;
+                li.classList.add('flex', 'justify-between', 'mb-4');
+                snippetList.appendChild(li);
+            });
+        }
+
+        function renderSnippetDetail(snippet) {
+            snippetDetail.innerHTML = `
+                <h1 class="text-xl font-bold mb-4">Code Snippet Generator</h1>
+                <textarea placeholder="Describe your code snippet here..." class="w-full p-2 border border-gray-300 rounded mb-4" rows="3"></textarea>
+                <button class="generate-code-btn w-full bg-green-500 text-white px-4 py-2 rounded mb-4">Generate Code</button>
+
+                <pre class="mb-2"><code class="language-${snippet.language}">${snippet.code}</code></pre>
+                <div class="flex justify-between mb-4">
+                    <input type="text" placeholder="Provide feedback for regenerating code..." class="code-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
+                    <button class="improve-code-btn bg-blue-500 text-white px-4 py-2 rounded">Improve Code</button>
+                </div>
+                <button class="generate-tests-btn w-full bg-purple-500 text-white px-4 py-2 rounded mb-4">Generate Test Cases</button>
+
+                <hr class="mb-4 border-t-2 border-gray-300">
+
+                <pre class="mb-2"><code class="language-${snippet.language}">${snippet.tests}</code></pre>
+                <div class="flex justify-between mb-4">
+                    <input type="text" placeholder="Provide feedback for regenerating test cases..." class="tests-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
+                    <button class="improve-tests-btn bg-blue-500 text-white px-4 py-2 rounded">Improve Tests</button>
+                </div>
+                <button class="run-tests-btn w-full bg-teal-500 text-white px-4 py-2 rounded mb-4">Run Test Code</button>
+                ${snippet.test_result ? `
+                    <div class="p-4 rounded mb-4 ${snippet.test_result === 'success' ? 'bg-green-300' : 'bg-red-300'}">
+                        ${snippet.test_result_message}
+                    </div>
+                    <button class="regenerate-btn w-full bg-gray-500 text-white px-4 py-2 rounded mb-4" ${snippet.test_result === 'success' ? 'disabled' : ''}>
+                        Regenerate (Enabled when failed; Send failed feedback to Regenerate)
+                    </button>
+                ` : ''}
+            `;
+            hljs.highlightAll();
+        }
+
+        async function createSnippet() {
+            const response = await fetch('/snippets', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({language: 'python', code: '', tests: ''}),
+            });
+            const newSnippet = await response.json();
+            renderSnippetDetail(newSnippet);
+            snippets.unshift(newSnippet);
+            renderSnippetList(snippets);
+        }
+
+        async function deleteSnippet(id) {
+            await fetch(`/snippets/${id}`, {method: 'DELETE'});
+            snippets = snippets.filter(snippet => snippet.id !== id);
+            renderSnippetList(snippets);
+            renderSnippetDetail(snippets[0]);
+        }
+
+        async function fetchSnippetDetail(id) {
+            const response = await fetch(`/snippets/${id}`);
+            return await response.json();
+        }
+
+        snippetList.addEventListener('click', async e => {
+            if (e.target.matches('.snippet-item')) {
+                const snippetId = Number(e.target.dataset.id);
+                const snippet = await fetchSnippetDetail(snippetId);
+                renderSnippetDetail(snippet);
+                currentSnippetId = snippetId;
+                renderSnippetList(snippets);
+            } else if (e.target.matches('.delete-btn')) {
+                const snippetId = Number(e.target.dataset.id);
+                deleteSnippet(snippetId);
+                snippets = snippets.filter(snippet => snippet.id !== snippetId);
+                if (currentSnippetId === snippetId) {
+                    currentSnippetId = null;
+                    renderSnippetDetail(snippets[0]);
+                }
+                renderSnippetList(snippets);
+            }
+        });
+
+        createBtn.addEventListener('click', createSnippet);
+
+        let snippets = [];
+        fetchSnippets().then(data => {
+            snippets = data;
+            currentSnippetId = snippets[0].id;
+            renderSnippetList(snippets);
+            renderSnippetDetail(snippets[0]);
+        });
+    </script>
+</body>
+
+</html>
