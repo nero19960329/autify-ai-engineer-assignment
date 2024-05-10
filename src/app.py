@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from src.database import engine, get_db
-from src import models
+from src import models, crud, schemas
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -42,21 +42,11 @@ async def get_snippets():
     return fake_snippets
 
 
-@app.post("/snippets")
-async def create_snippet(snippet):
-    # Fake creating a new snippet
-    return {
-        "id": 3,
-        "title": "New Snippet",
-        "language": "python",
-        "description": "",
-        "code": "",
-        "code_feedback": "",
-        "tests": "",
-        "tests_feedback": "",
-        "test_result": "",
-        "test_result_message": "",
-    }
+@app.post("/snippets", response_model=schemas.Snippet)
+async def create_snippet(
+    snippet_data: schemas.SnippetCreate, db: Session = Depends(get_db)
+):
+    return crud.create_snippet(db, snippet_data)
 
 
 @app.get("/snippets/{snippet_id}")
