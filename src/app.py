@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
@@ -37,9 +37,9 @@ fake_snippets = [
 ]
 
 
-@app.get("/snippets")
-async def get_snippets():
-    return fake_snippets
+@app.get("/snippets", response_model=list[schemas.Snippet])
+async def get_snippets(db: Session = Depends(get_db)):
+    return crud.get_snippets(db)
 
 
 @app.post("/snippets", response_model=schemas.Snippet)
@@ -49,10 +49,12 @@ async def create_snippet(
     return crud.create_snippet(db, snippet_data)
 
 
-@app.get("/snippets/{snippet_id}")
-async def get_snippet(snippet_id: int):
-    # Fake retrieving a snippet by ID
-    return fake_snippets[snippet_id - 1]
+@app.get("/snippets/{snippet_id}", response_model=schemas.Snippet)
+async def get_snippet(snippet_id: int, db: Session = Depends(get_db)):
+    db_snippet = crud.get_snippet(db, snippet_id)
+    if not db_snippet:
+        raise HTTPException(status_code=404, detail="Snippet not found")
+    return db_snippet
 
 
 @app.put("/snippets/{snippet_id}")
@@ -76,32 +78,3 @@ async def update_snippet(snippet_id: int, updated_snippet):
 async def delete_snippet(snippet_id: int):
     # Fake deleting a snippet
     return {"message": f"Snippet with ID {snippet_id} has been deleted"}
-
-
-@app.get("/test-db")
-async def test_db(db: Session = Depends(get_db)):
-    test_snippet = models.Snippet(
-        title="Test Snippet", language="Python", code="print('Hello, World!')"
-    )
-    db.add(test_snippet)
-    db.commit()
-    db.refresh(test_snippet)
-
-    retrieved_snippet = (
-        db.query(models.Snippet).filter(models.Snippet.id == test_snippet.id).first()
-    )
-
-    return {
-        "created_snippet": {
-            "id": test_snippet.id,
-            "title": test_snippet.title,
-            "language": test_snippet.language,
-            "code": test_snippet.code,
-        },
-        "retrieved_snippet": {
-            "id": retrieved_snippet.id,
-            "title": retrieved_snippet.title,
-            "language": retrieved_snippet.language,
-            "code": retrieved_snippet.code,
-        },
-    }
