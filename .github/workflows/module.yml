@@ -22,4 +22,6 @@ jobs:
           pip install -r requirements-dev.txt
       - name: Check formatting
         run: black --check src/
+      - name: Run tests
+        run: ENV=test pytest tests/unit
       
