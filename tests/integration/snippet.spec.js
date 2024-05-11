@@ -23,7 +23,7 @@ describe("Code Snippet Generator", () => {
       .first()
       .should("have.class", "bg-gray-500");
     cy.get("#snippet-detail textarea").should("be.visible");
-    cy.get("#snippet-detail .generate-code-btn").should("be.visible");
+    cy.get("#snippet-detail #generate-code-btn").should("be.visible");
   });
 
   it("should not show delete button when there is only one snippet", () => {
@@ -49,6 +49,6 @@ describe("Code Snippet Generator", () => {
       .first()
       .should("have.class", "bg-gray-500");
     cy.get("#snippet-detail textarea").should("be.visible");
-    cy.get("#snippet-detail .generate-code-btn").should("be.visible");
+    cy.get("#snippet-detail #generate-code-btn").should("be.visible");
   });
 });

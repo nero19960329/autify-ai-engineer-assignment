@@ -23,7 +23,31 @@
         <!-- Right Column for Editor and Controls -->
         <div id="snippet-detail" class="w-1/2 p-4">
             <h1 class="text-xl font-bold mb-4">Code Snippet Generator</h1>
-            <p>Select a snippet from the list to view details.</p>
+            <p id="no-snippet-selected">Select a snippet from the list to view details.</p>
+            <div id="snippet-editor" style="display: none;">
+                <textarea id="code-description" placeholder="Describe your code snippet here..." class="w-full p-2 border border-gray-300 rounded mb-4" rows="3"></textarea>
+                <button id="generate-code-btn" class="w-full bg-green-500 text-white px-4 py-2 rounded mb-4">Generate Code</button>
+
+                <pre id="generated-code" class="mb-2"><code class="python"></code></pre>
+                <div class="flex justify-between mb-4">
+                    <input type="text" id="code-feedback" placeholder="Provide feedback for regenerating code..." class="code-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
+                    <button id="improve-code-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Improve Code</button>
+                </div>
+                <button id="generate-tests-btn" class="w-full bg-purple-500 text-white px-4 py-2 rounded mb-4">Generate Test Cases</button>
+
+                <hr class="mb-4 border-t-2 border-gray-300">
+
+                <pre id="generated-tests" class="mb-2"><code class="python"></code></pre>
+                <div class="flex justify-between mb-4">
+                    <input type="text" id="tests-feedback" placeholder="Provide feedback for regenerating test cases..." class="tests-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
+                    <button id="improve-tests-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Improve Tests</button>
+                </div>
+                <button id="run-tests-btn" class="w-full bg-teal-500 text-white px-4 py-2 rounded mb-4">Run Test Code</button>
+                <div id="test-results" class="p-4 rounded mb-4"></div>
+                <button id="regenerate-btn" class="w-full bg-gray-500 text-white px-4 py-2 rounded mb-4" disabled>
+                    Regenerate (Enabled when failed; Send failed feedback to Regenerate)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -32,6 +56,20 @@
         const createBtn = document.getElementById('create-snippet-btn');
         const snippetList = document.getElementById('snippet-list');
         const snippetDetail = document.getElementById('snippet-detail');
+        const noSnippetSelected = document.getElementById('no-snippet-selected');
+        const snippetEditor = document.getElementById('snippet-editor');
+        const codeDescription = document.getElementById('code-description');
+        const generateCodeBtn = document.getElementById('generate-code-btn');
+        const generatedCode = document.getElementById('generated-code');
+        const codeFeedback = document.getElementById('code-feedback');
+        const improveCodeBtn = document.getElementById('improve-code-btn');
+        const generateTestsBtn = document.getElementById('generate-tests-btn');
+        const generatedTests = document.getElementById('generated-tests');
+        const testsFeedback = document.getElementById('tests-feedback');
+        const improveTestsBtn = document.getElementById('improve-tests-btn');
+        const runTestsBtn = document.getElementById('run-tests-btn');
+        const testResults = document.getElementById('test-results');
+        const regenerateBtn = document.getElementById('regenerate-btn');
 
         async function fetchSnippets() {
             const response = await fetch('/snippets');
@@ -43,15 +81,17 @@
         }
 
         let currentSnippetId = null;
-        
+
         function renderSnippetList(snippets) {
             snippetList.innerHTML = '';
             snippets.forEach(snippet => {
                 const isSelected = snippet.id === currentSnippetId;
                 const li = document.createElement('li');
+                const title = snippet.title || 'New Snippet';
+                const language = snippet.language ? snippet.language.charAt(0).toUpperCase() + snippet.language.slice(1) : "";
                 li.innerHTML = `
                     <a href="#" class="snippet-item w-full block p-2 rounded ${isSelected ? 'bg-gray-500 text-white' : 'bg-gray-300'}" data-id="${snippet.id}">
-                        ${snippet.title} | ${snippet.language}
+                        ${title} | ${language}
                     </a>
                     ${!isSelected ? '<button class="delete-btn bg-red-500 text-white px-2 py-1 rounded" data-id="' + snippet.id + '">Delete</button>' : ''}
                 `;
@@ -62,42 +102,19 @@
 
         function renderSnippetDetail(snippet) {
             if (!snippet) {
-                snippetDetail.innerHTML = `
-                    <h1 class="text-xl font-bold mb-4">Code Snippet Generator</h1>
-                    <p>Select a snippet from the list to view details.</p>
-                `;
+                noSnippetSelected.style.display = 'block';
+                snippetEditor.style.display = 'none';
                 return;
             }
 
-            snippetDetail.innerHTML = `
-                <h1 class="text-xl font-bold mb-4">Code Snippet Generator</h1>
-                <textarea placeholder="Describe your code snippet here..." class="w-full p-2 border border-gray-300 rounded mb-4" rows="3"></textarea>
-                <button class="generate-code-btn w-full bg-green-500 text-white px-4 py-2 rounded mb-4">Generate Code</button>
+            noSnippetSelected.style.display = 'none';
+            snippetEditor.style.display = 'block';
 
-                <pre class="mb-2"><code class="language-${snippet.language}">${snippet.code}</code></pre>
-                <div class="flex justify-between mb-4">
-                    <input type="text" placeholder="Provide feedback for regenerating code..." class="code-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
-                    <button class="improve-code-btn bg-blue-500 text-white px-4 py-2 rounded">Improve Code</button>
-                </div>
-                <button class="generate-tests-btn w-full bg-purple-500 text-white px-4 py-2 rounded mb-4">Generate Test Cases</button>
+            codeDescription.value = snippet.description || '';
+            generatedCode.querySelector('code').textContent = snippet.code || '';
+            generatedTests.querySelector('code').textContent = snippet.tests || '';
+            testResults.innerHTML = '';
 
-                <hr class="mb-4 border-t-2 border-gray-300">
-
-                <pre class="mb-2"><code class="language-${snippet.language}">${snippet.tests}</code></pre>
-                <div class="flex justify-between mb-4">
-                    <input type="text" placeholder="Provide feedback for regenerating test cases..." class="tests-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
-                    <button class="improve-tests-btn bg-blue-500 text-white px-4 py-2 rounded">Improve Tests</button>
-                </div>
-                <button class="run-tests-btn w-full bg-teal-500 text-white px-4 py-2 rounded mb-4">Run Test Code</button>
-                ${snippet.test_result ? `
-                    <div class="p-4 rounded mb-4 ${snippet.test_result === 'success' ? 'bg-green-300' : 'bg-red-300'}">
-                        ${snippet.test_result_message}
-                    </div>
-                    <button class="regenerate-btn w-full bg-gray-500 text-white px-4 py-2 rounded mb-4" ${snippet.test_result === 'success' ? 'disabled' : ''}>
-                        Regenerate (Enabled when failed; Send failed feedback to Regenerate)
-                    </button>
-                ` : ''}
-            `;
             hljs.highlightAll();
         }
 
@@ -116,6 +133,15 @@
         }
 
         createBtn.addEventListener('click', createSnippet);
+
+        async function updateSnippet(snippet) {
+            await fetch(`/snippets/${snippet.id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(snippet),
+            });
+            renderSnippetList(snippets);
+        }
 
         async function deleteSnippet(id) {
             const response = await fetch(`/snippets/${id}`, {method: 'DELETE'});
@@ -149,15 +175,141 @@
                     snippets = snippets.filter(snippet => snippet.id !== snippetId);
                     if (currentSnippetId === snippetId) {
                         currentSnippetId = null;
-                        renderSnippetDetail({title: '', language: '', code: '', tests: ''});
+                        renderSnippetDetail(null);
                     }
                     renderSnippetList(snippets);
-                    renderSnippetDetail(snippets[0] || null);
                 }
             }
         });
 
-        createBtn.addEventListener('click', createSnippet);
+        async function generateCode() {
+            const snippet = snippets.find(s => s.id === currentSnippetId);
+            
+            const response = await fetch('/generate_code', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    description: codeDescription.value,
+                }),
+            });
+            const codeData = await response.json();
+            if (codeData.language !== snippet.language) {
+                snippet.language = codeData.language;
+                await updateSnippet(snippet);
+            }
+            
+            if (!snippet.title) {
+                const titleResponse = await fetch('/generate_title', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        description: codeDescription.value,
+                    }),
+                });
+                const titleData = await titleResponse.json();
+
+                snippet.title = titleData.title;
+                await updateSnippet(snippet);
+            }
+
+            const codeElement = generatedCode.querySelector('code');
+            codeElement.className = codeData.language;
+            codeElement.textContent = codeData.code;
+
+            if (codeElement.hasAttribute('data-highlighted')) {
+                codeElement.removeAttribute('data-highlighted');
+                hljs.highlightElement(codeElement);
+            }
+        }
+
+        generateCodeBtn.addEventListener('click', generateCode);
+
+        async function improveCode() {
+            const response = await fetch('/generate_code_from_feedback', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    code: generatedCode.querySelector('code').textContent,
+                    feedback: codeFeedback.value,
+                }),
+            });
+            const data = await response.json();
+            
+            const codeElement = generatedCode.querySelector('code');
+            codeElement.textContent = data.code;
+
+            if (codeElement.hasAttribute('data-highlighted')) {
+                codeElement.removeAttribute('data-highlighted');
+                hljs.highlightElement(codeElement);
+            }
+        }
+
+        improveCodeBtn.addEventListener('click', improveCode);
+
+        async function generateTests() {
+            const response = await fetch('/generate_tests', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    code: generatedCode.querySelector('code').textContent,
+                }),
+            });
+            const data = await response.json();
+
+            const testsElement = generatedTests.querySelector('code');
+            testsElement.textContent = data.test_code;
+
+            if (testsElement.hasAttribute('data-highlighted')) {
+                testsElement.removeAttribute('data-highlighted');
+                hljs.highlightElement(testsElement);
+            }
+        }
+
+        generateTestsBtn.addEventListener('click', generateTests);
+
+        async function improveTests() {
+            const response = await fetch('/generate_tests_from_feedback', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    code: generatedCode.querySelector('code').textContent,
+                    test_code: generatedTests.querySelector('code').textContent,
+                    feedback: testsFeedback.value,
+                }),
+            });
+            const data = await response.json();
+
+            const testsElement = generatedTests.querySelector('code');
+            testsElement.textContent = data.test_code;
+
+            if (testsElement.hasAttribute('data-highlighted')) {
+                testsElement.removeAttribute('data-highlighted');
+                hljs.highlightElement(testsElement);
+            }
+        }
+
+        improveTestsBtn.addEventListener('click', improveTests);
+
+        async function runTests() {
+            const response = await fetch('/run_tests', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    code: generatedCode.querySelector('code').textContent,
+                    test_code: generatedTests.querySelector('code').textContent,
+                    language: 'python',
+                }),
+            });
+            const data = await response.json();
+            testResults.innerHTML = `
+                <div class="p-4 rounded mb-4 ${data.result === 'success' ? 'bg-green-300' : 'bg-red-300'}">
+                    ${data.message}
+                </div>
+            `;
+            regenerateBtn.disabled = data.result === 'success';
+        }
+
+        runTestsBtn.addEventListener('click', runTests);
 
         document.addEventListener('DOMContentLoaded', async () => {
             snippets = await fetchSnippets();

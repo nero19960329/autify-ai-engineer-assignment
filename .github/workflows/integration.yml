@@ -40,4 +40,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: cypress-videos
-        path: tests/cypress/videos
+        path: tests/integration/cypress/videos
