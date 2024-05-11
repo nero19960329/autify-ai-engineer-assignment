@@ -3,4 +3,3 @@ uvicorn
 openai
 sqlalchemy
 pydantic
-pytest

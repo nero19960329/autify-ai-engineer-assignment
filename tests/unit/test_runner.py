@@ -7,10 +7,9 @@ def add(a, b):
     return a + b
 """
     test_code = """
-def test_add():
-    assert add(1, 2) == 3
-    assert add(0, 0) == 0
-    assert add(-1, 1) == 0
+assert add(1, 2) == 3
+assert add(0, 0) == 0
+assert add(-1, 1) == 0
 """
     result = run_python_code(code, test_code)
     assert result["result"] == "success"
@@ -22,10 +21,9 @@ def add(a, b):
     return a - b  # Intentional bug
 """
     test_code = """
-def test_add():
-    assert add(1, 2) == 3
-    assert add(0, 0) == 0
-    assert add(-1, 1) == 0
+assert add(1, 2) == 3
+assert add(0, 0) == 0
+assert add(-1, 1) == 0
 """
     result = run_python_code(code, test_code)
     assert result["result"] == "failure"
@@ -39,8 +37,7 @@ def infinite_loop():
         pass
 """
     test_code = """
-def test_infinite_loop():
-    infinite_loop()
+infinite_loop()
 """
     result = run_python_code(code, test_code, timeout_ms=1000)
     assert result["result"] == "failure"
@@ -54,8 +51,7 @@ def memory_exhausted():
     c = [i for i in range(10**6)]
 """
     test_code = """
-def test_memory_exhausted():
-    memory_exhausted()
+memory_exhausted()
 """
     result = run_python_code(code, test_code, memory_limit_mb=50)
     assert result["result"] == "failure"
