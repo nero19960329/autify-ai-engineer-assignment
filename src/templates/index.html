@@ -61,6 +61,14 @@
         }
 
         function renderSnippetDetail(snippet) {
+            if (!snippet) {
+                snippetDetail.innerHTML = `
+                    <h1 class="text-xl font-bold mb-4">Code Snippet Generator</h1>
+                    <p>Select a snippet from the list to view details.</p>
+                `;
+                return;
+            }
+
             snippetDetail.innerHTML = `
                 <h1 class="text-xl font-bold mb-4">Code Snippet Generator</h1>
                 <textarea placeholder="Describe your code snippet here..." class="w-full p-2 border border-gray-300 rounded mb-4" rows="3"></textarea>
@@ -100,9 +108,11 @@
                 body: JSON.stringify({}),
             });
             const newSnippet = await response.json();
-            renderSnippetDetail(newSnippet);
             snippets.unshift(newSnippet);
             renderSnippetList(snippets);
+
+            const newSnippetItem = document.querySelector(`.snippet-item[data-id="${newSnippet.id}"]`);
+            newSnippetItem.click();
         }
 
         createBtn.addEventListener('click', createSnippet);
@@ -142,7 +152,7 @@
                         renderSnippetDetail({title: '', language: '', code: '', tests: ''});
                     }
                     renderSnippetList(snippets);
-                    renderSnippetDetail(snippets[0] || {});
+                    renderSnippetDetail(snippets[0] || null);
                 }
             }
         });
