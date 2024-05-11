@@ -1,0 +1,10 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "test": "cypress run"
+  },
+  "dependencies": {
+    "cypress": "^13.9.0",
+    "prettier": "^3.2.5"
+  }
+}
