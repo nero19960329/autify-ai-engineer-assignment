@@ -1,5 +1,3 @@
-import pytest
-
 from src.runner import run_python_code
 
 
