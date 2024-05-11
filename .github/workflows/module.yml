@@ -24,4 +24,16 @@ jobs:
         run: black --check src/
       - name: Run tests
         run: ENV=test pytest tests/unit
-      
+  
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: yarn --cwd tests/integration install
+      - name: Check formatting
+        run: yarn --cwd tests/integration prettier --check .

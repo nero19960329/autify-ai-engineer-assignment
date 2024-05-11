@@ -1,0 +1,43 @@
+name: Integration CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Start services
+      run: |
+        echo "SQLALCHEMY_DATABASE_URI=sqlite:///:memory:" > .env
+        docker build -t code-snippet-app .
+        docker run -d -p 8000:8000 --env-file .env --name code-snippet-app code-snippet-app
+    - name: Install test dependencies
+      run: cd tests/integration && yarn
+    - name: Wait for services to start
+      run: |
+        until $(curl --output /dev/null --silent --fail http://localhost:8000); do
+          printf '.'
+          sleep 5
+        done
+    - name: Run integration tests
+      uses: cypress-io/github-action@v6
+      with:
+        working-directory: tests/integration
+    - name: Tear down services
+      run: |
+        docker stop code-snippet-app
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-videos
+        path: tests/cypress/videos
