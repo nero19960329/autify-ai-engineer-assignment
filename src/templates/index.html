@@ -35,6 +35,10 @@
 
         async function fetchSnippets() {
             const response = await fetch('/snippets');
+            if (!response.ok) {
+                console.error('Failed to fetch snippets:', response.status);
+                return [];
+            }
             return await response.json();
         }
 
@@ -93,7 +97,7 @@
             const response = await fetch('/snippets', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({language: 'python', code: '', tests: ''}),
+                body: JSON.stringify({}),
             });
             const newSnippet = await response.json();
             renderSnippetDetail(newSnippet);
@@ -101,15 +105,22 @@
             renderSnippetList(snippets);
         }
 
+        createBtn.addEventListener('click', createSnippet);
+
         async function deleteSnippet(id) {
-            await fetch(`/snippets/${id}`, {method: 'DELETE'});
-            snippets = snippets.filter(snippet => snippet.id !== id);
-            renderSnippetList(snippets);
-            renderSnippetDetail(snippets[0]);
+            const response = await fetch(`/snippets/${id}`, {method: 'DELETE'});
+            if (!response.ok) {
+                console.error('Failed to delete snippet:', response.status);
+            }
+            return response.ok;
         }
 
         async function fetchSnippetDetail(id) {
             const response = await fetch(`/snippets/${id}`);
+            if (!response.ok) {
+                console.error('Failed to fetch snippet detail:', response.status);
+                return null;
+            }
             return await response.json();
         }
 
@@ -117,29 +128,33 @@
             if (e.target.matches('.snippet-item')) {
                 const snippetId = Number(e.target.dataset.id);
                 const snippet = await fetchSnippetDetail(snippetId);
-                renderSnippetDetail(snippet);
-                currentSnippetId = snippetId;
-                renderSnippetList(snippets);
+                if (snippet) {
+                    renderSnippetDetail(snippet);
+                    currentSnippetId = snippetId;
+                    renderSnippetList(snippets);
+                }
             } else if (e.target.matches('.delete-btn')) {
                 const snippetId = Number(e.target.dataset.id);
-                deleteSnippet(snippetId);
-                snippets = snippets.filter(snippet => snippet.id !== snippetId);
-                if (currentSnippetId === snippetId) {
-                    currentSnippetId = null;
-                    renderSnippetDetail(snippets[0]);
+                if (await deleteSnippet(snippetId)) {
+                    snippets = snippets.filter(snippet => snippet.id !== snippetId);
+                    if (currentSnippetId === snippetId) {
+                        currentSnippetId = null;
+                        renderSnippetDetail({title: '', language: '', code: '', tests: ''});
+                    }
+                    renderSnippetList(snippets);
+                    renderSnippetDetail(snippets[0] || {});
                 }
-                renderSnippetList(snippets);
             }
         });
 
         createBtn.addEventListener('click', createSnippet);
 
-        let snippets = [];
-        fetchSnippets().then(data => {
-            snippets = data;
-            currentSnippetId = snippets[0].id;
+        document.addEventListener('DOMContentLoaded', async () => {
+            snippets = await fetchSnippets();
             renderSnippetList(snippets);
-            renderSnippetDetail(snippets[0]);
+            if (snippets.length > 0) {
+                renderSnippetDetail(snippets[0]);
+            }
         });
     </script>
 </body>
