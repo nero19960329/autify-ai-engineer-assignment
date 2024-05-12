@@ -23,21 +23,21 @@ class Snippet(SnippetCreate):
     updated_at: datetime
 
 
+class LanguageDetRequest(BaseModel):
+    description: str
+    code: str
+
+
+class LanguageDetResponse(BaseModel):
+    language: str
+
+
 class CodeGenRequest(BaseModel):
     description: str
 
 
-class CodeGenResponse(BaseModel):
-    code: str
-    language: str
-
-
 class TitleGenRequest(BaseModel):
     description: str
-
-
-class TitleGenResponse(BaseModel):
-    title: str
 
 
 class CodeFeedbackRequest(BaseModel):
@@ -47,10 +47,6 @@ class CodeFeedbackRequest(BaseModel):
 
 class TestGenRequest(BaseModel):
     code: str
-
-
-class TestGenResponse(BaseModel):
-    test_code: str
 
 
 class TestsFeedbackRequest(BaseModel):
