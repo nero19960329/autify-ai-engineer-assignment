@@ -16,7 +16,13 @@ def get_snippet(db: Session, snippet_id: int) -> models.Snippet:
 
 
 def get_snippets(db: Session, skip: int = 0, limit: int = 100) -> list[models.Snippet]:
-    return db.query(models.Snippet).offset(skip).limit(limit).all()
+    return (
+        db.query(models.Snippet)
+        .order_by(models.Snippet.updated_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 
 def update_snippet(
