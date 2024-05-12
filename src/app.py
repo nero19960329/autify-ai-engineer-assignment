@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from src.database import engine, get_db
 from src.runner import run_python_code
-from src.routers import snippets, generate_fake
+from src.routers import snippets, generate_fake, generate
 from src import models, crud, schemas
 
 models.Base.metadata.create_all(bind=engine)
@@ -15,6 +15,8 @@ app = FastAPI()
 app.include_router(snippets.router)
 if os.getenv("ENV") == "test":
     app.include_router(generate_fake.router)
+else:
+    app.include_router(generate.router)
 
 templates = Jinja2Templates(directory="src/templates")
 

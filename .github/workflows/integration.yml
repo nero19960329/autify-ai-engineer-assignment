@@ -18,14 +18,13 @@ jobs:
         node-version: 20
     - name: Start services
       run: |
-        echo "SQLALCHEMY_DATABASE_URI=sqlite:///:memory:" > .env
         docker build -t code-snippet-app .
-        docker run -d -p 8000:8000 --env-file .env --name code-snippet-app code-snippet-app
+        docker run -d -p 8001:8000 --env ENV=test --name code-snippet-app code-snippet-app
     - name: Install test dependencies
       run: cd tests/integration && yarn
     - name: Wait for services to start
       run: |
-        until $(curl --output /dev/null --silent --fail http://localhost:8000); do
+        until $(curl --output /dev/null --silent --fail http://localhost:8001); do
           printf '.'
           sleep 5
         done
@@ -33,6 +32,7 @@ jobs:
       uses: cypress-io/github-action@v6
       with:
         working-directory: tests/integration
+        config-file: cypress.ui.config.js
     - name: Tear down services
       run: |
         docker stop code-snippet-app

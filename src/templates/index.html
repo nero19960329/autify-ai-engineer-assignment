@@ -279,7 +279,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    code: generatedCode.querySelector('code').textContent,
+                    code: snippet.code,
                     feedback: codeFeedback.value,
                 }),
             });
@@ -305,7 +305,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    code: generatedCode.querySelector('code').textContent,
+                    code: snippet.code,
                 }),
             });
             
@@ -331,8 +331,8 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    code: generatedCode.querySelector('code').textContent,
-                    test_code: generatedTests.querySelector('code').textContent,
+                    code: snippet.code,
+                    test_code: snippet.test_code,
                     feedback: testsFeedback.value,
                 }),
             });
