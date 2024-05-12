@@ -117,7 +117,8 @@
             testsFeedback.value = snippet.test_feedback || '';
             testResults.innerHTML = '';
 
-            hljs.highlightAll();
+            highlightCode(generatedCode.querySelector('code'));
+            highlightCode(generatedTests.querySelector('code'));
         }
 
         async function createSnippet() {
