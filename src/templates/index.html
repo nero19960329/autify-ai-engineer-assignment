@@ -112,7 +112,9 @@
 
             codeDescription.value = snippet.description || '';
             generatedCode.querySelector('code').textContent = snippet.code || '';
-            generatedTests.querySelector('code').textContent = snippet.tests || '';
+            codeFeedback.value = snippet.feedback || '';
+            generatedTests.querySelector('code').textContent = snippet.test_code || '';
+            testsFeedback.value = snippet.test_feedback || '';
             testResults.innerHTML = '';
 
             hljs.highlightAll();
@@ -211,6 +213,8 @@
 
         async function generateCode() {
             const snippet = snippets.find(s => s.id === currentSnippetId);
+            snippet.description = codeDescription.value;
+
             const codeElement = generatedCode.querySelector('code');
             codeElement.textContent = '';
             
@@ -265,6 +269,8 @@
 
         async function improveCode() {
             const snippet = snippets.find(s => s.id === currentSnippetId);
+            snippet.feedback = codeFeedback.value;
+
             const codeElement = generatedCode.querySelector('code');
             codeElement.textContent = '';
 
@@ -290,6 +296,7 @@
 
         async function generateTests() {
             const snippet = snippets.find(s => s.id === currentSnippetId);
+
             const testsElement = generatedTests.querySelector('code');
             testsElement.textContent = '';
 
@@ -314,6 +321,8 @@
 
         async function improveTests() {
             const snippet = snippets.find(s => s.id === currentSnippetId);
+            snippet.test_feedback = testsFeedback.value;
+
             const testsElement = generatedTests.querySelector('code');
             testsElement.textContent = '';
 
@@ -343,6 +352,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
+                    snippet_id: currentSnippetId,
                     code: generatedCode.querySelector('code').textContent,
                     test_code: generatedTests.querySelector('code').textContent,
                     language: 'python',
