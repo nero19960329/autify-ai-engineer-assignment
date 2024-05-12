@@ -182,21 +182,51 @@
             }
         });
 
+        async function streamResponse(response, callback) {
+            const reader = response.body.getReader();
+            let decoder = new TextDecoder();
+
+            let result = '';
+            while (true) {
+                const {value, done} = await reader.read();
+                if (done) break;
+                
+                const decodedValue = decoder.decode(value);
+                result += decodedValue;
+                
+                callback(decodedValue);
+            }
+            
+            return result;
+        }
+
+        function highlightCode(codeElement) {
+            if (codeElement.hasAttribute('data-highlighted')) {
+                codeElement.removeAttribute('data-highlighted');
+                hljs.highlightElement(codeElement);
+            } else {
+                codeElement.setAttribute('data-highlighted', 'true');
+            }
+        }
+
         async function generateCode() {
             const snippet = snippets.find(s => s.id === currentSnippetId);
+            const codeElement = generatedCode.querySelector('code');
+            codeElement.textContent = '';
             
-            const response = await fetch('/generate_code', {
+            const codeResponse = await fetch('/generate_code', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     description: codeDescription.value,
                 }),
             });
-            const codeData = await response.json();
-            if (codeData.language !== snippet.language) {
-                snippet.language = codeData.language;
-                await updateSnippet(snippet);
-            }
+
+            const codeData = await streamResponse(codeResponse, data => {
+                codeElement.textContent += data;
+                highlightCode(codeElement);
+            });
+            snippet.code = codeData;
             
             if (!snippet.title) {
                 const titleResponse = await fetch('/generate_title', {
@@ -206,25 +236,38 @@
                         description: codeDescription.value,
                     }),
                 });
-                const titleData = await titleResponse.json();
+                const titleData = await streamResponse(titleResponse, data => {
+                    snippet.title += data;
+                    updateSnippet(snippet);
+                });
+            }
 
-                snippet.title = titleData.title;
+            const langResponse = await fetch('/detect_language', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    description: codeDescription.value,
+                    code: codeData,
+                }),
+            });
+            const langData = await langResponse.json();
+            if (langData.language !== snippet.language) {
+                snippet.language = langData.language;
                 await updateSnippet(snippet);
             }
+            codeElement.className = langData.language;
+            highlightCode(codeElement);
 
-            const codeElement = generatedCode.querySelector('code');
-            codeElement.className = codeData.language;
-            codeElement.textContent = codeData.code;
-
-            if (codeElement.hasAttribute('data-highlighted')) {
-                codeElement.removeAttribute('data-highlighted');
-                hljs.highlightElement(codeElement);
-            }
+            await updateSnippet(snippet);
         }
 
         generateCodeBtn.addEventListener('click', generateCode);
 
         async function improveCode() {
+            const snippet = snippets.find(s => s.id === currentSnippetId);
+            const codeElement = generatedCode.querySelector('code');
+            codeElement.textContent = '';
+
             const response = await fetch('/generate_code_from_feedback', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -233,20 +276,23 @@
                     feedback: codeFeedback.value,
                 }),
             });
-            const data = await response.json();
-            
-            const codeElement = generatedCode.querySelector('code');
-            codeElement.textContent = data.code;
 
-            if (codeElement.hasAttribute('data-highlighted')) {
-                codeElement.removeAttribute('data-highlighted');
-                hljs.highlightElement(codeElement);
-            }
+            const codeData = await streamResponse(response, data => {
+                codeElement.textContent += data;
+                highlightCode(codeElement);
+            });
+
+            snippet.code = codeData;
+            await updateSnippet(snippet);
         }
 
         improveCodeBtn.addEventListener('click', improveCode);
 
         async function generateTests() {
+            const snippet = snippets.find(s => s.id === currentSnippetId);
+            const testsElement = generatedTests.querySelector('code');
+            testsElement.textContent = '';
+
             const response = await fetch('/generate_tests', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -254,20 +300,23 @@
                     code: generatedCode.querySelector('code').textContent,
                 }),
             });
-            const data = await response.json();
+            
+            const testsData = await streamResponse(response, data => {
+                testsElement.textContent += data;
+                highlightCode(testsElement);
+            });
 
-            const testsElement = generatedTests.querySelector('code');
-            testsElement.textContent = data.test_code;
-
-            if (testsElement.hasAttribute('data-highlighted')) {
-                testsElement.removeAttribute('data-highlighted');
-                hljs.highlightElement(testsElement);
-            }
+            snippet.test_code = testsData;
+            await updateSnippet(snippet);
         }
 
         generateTestsBtn.addEventListener('click', generateTests);
 
         async function improveTests() {
+            const snippet = snippets.find(s => s.id === currentSnippetId);
+            const testsElement = generatedTests.querySelector('code');
+            testsElement.textContent = '';
+
             const response = await fetch('/generate_tests_from_feedback', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -277,15 +326,14 @@
                     feedback: testsFeedback.value,
                 }),
             });
-            const data = await response.json();
 
-            const testsElement = generatedTests.querySelector('code');
-            testsElement.textContent = data.test_code;
+            const testsData = await streamResponse(response, data => {
+                testsElement.textContent += data;
+                highlightCode(testsElement);
+            });
 
-            if (testsElement.hasAttribute('data-highlighted')) {
-                testsElement.removeAttribute('data-highlighted');
-                hljs.highlightElement(testsElement);
-            }
+            snippet.test_code = testsData;
+            await updateSnippet(snippet);
         }
 
         improveTestsBtn.addEventListener('click', improveTests);

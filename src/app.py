@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
@@ -54,34 +55,49 @@ async def delete_snippet(snippet_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Snippet not found")
 
 
-@app.post("/generate_title", response_model=schemas.TitleGenResponse)
-async def generate_title(titel_gen_data: schemas.TitleGenRequest):
+async def fake_stream_data(data: str):
+    import asyncio
+
+    for char in data:
+        yield char
+        await asyncio.sleep(0.01)  # Simulate slow streaming
+
+
+@app.post("/generate_title")
+async def generate_title(title_gen_data: schemas.TitleGenRequest):
     fake_title = "Add two numbers"
-    return {"title": fake_title}
+    return StreamingResponse(
+        fake_stream_data(fake_title), media_type="application/json"
+    )
 
 
-@app.post("/generate_code", response_model=schemas.CodeGenResponse)
+@app.post("/generate_code")
 async def generate_code(code_gen_data: schemas.CodeGenRequest):
     fake_code = "def sum(a, b):\n    return a + b"
-    return {"code": fake_code, "language": "python"}
+    return StreamingResponse(fake_stream_data(fake_code), media_type="application/json")
 
 
-@app.post("/generate_code_from_feedback", response_model=schemas.CodeGenResponse)
+@app.post("/detect_language", response_model=schemas.LanguageDetResponse)
+async def detect_language(language_gen_data: schemas.LanguageDetRequest):
+    return {"language": "python"}
+
+
+@app.post("/generate_code_from_feedback")
 async def generate_code_from_feedback(feedback_data: schemas.CodeFeedbackRequest):
     fake_code = "def sum(a: int, b: int) -> int:\n    return a + b"
-    return {"code": fake_code, "language": "python"}
+    return StreamingResponse(fake_stream_data(fake_code), media_type="application/json")
 
 
-@app.post("/generate_tests", response_model=schemas.TestGenResponse)
+@app.post("/generate_tests")
 async def generate_tests(test_gen_data: schemas.TestGenRequest):
     fake_code = "assert sum(1, 2) == 3"
-    return {"test_code": fake_code, "language": "python"}
+    return StreamingResponse(fake_stream_data(fake_code), media_type="application/json")
 
 
-@app.post("/generate_tests_from_feedback", response_model=schemas.TestGenResponse)
+@app.post("/generate_tests_from_feedback")
 async def generate_tests_from_feedback(feedback_data: schemas.TestsFeedbackRequest):
     fake_code = "assert sum(1, 2) == 3\nassert sum(2, 3) == 5"
-    return {"test_code": fake_code, "language": "python"}
+    return StreamingResponse(fake_stream_data(fake_code), media_type="application/json")
 
 
 @app.post("/run_tests", status_code=200)
