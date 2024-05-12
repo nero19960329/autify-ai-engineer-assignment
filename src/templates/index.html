@@ -374,6 +374,8 @@
             snippets = await fetchSnippets();
             renderSnippetList(snippets);
             if (snippets.length > 0) {
+                const firstSnippetItem = document.querySelector('.snippet-item');
+                firstSnippetItem.click();
                 renderSnippetDetail(snippets[0]);
             }
         });
