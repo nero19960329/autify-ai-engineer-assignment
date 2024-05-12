@@ -219,7 +219,7 @@
             const codeElement = generatedCode.querySelector('code');
             codeElement.textContent = '';
             
-            const codeResponse = await fetch('/generate_code', {
+            const codeResponse = await fetch('/generate/code', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -234,7 +234,7 @@
             snippet.code = codeData;
             
             if (!snippet.title) {
-                const titleResponse = await fetch('/generate_title', {
+                const titleResponse = await fetch('/generate/title', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -247,7 +247,7 @@
                 });
             }
 
-            const langResponse = await fetch('/detect_language', {
+            const langResponse = await fetch('/generate/detect_language', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -275,11 +275,11 @@
             const codeElement = generatedCode.querySelector('code');
             codeElement.textContent = '';
 
-            const response = await fetch('/generate_code_from_feedback', {
+            const response = await fetch('/generate/code_from_feedback', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    code: generatedCode.querySelector('code').textContent,
+                    code: snippet.code,
                     feedback: codeFeedback.value,
                 }),
             });
@@ -301,11 +301,11 @@
             const testsElement = generatedTests.querySelector('code');
             testsElement.textContent = '';
 
-            const response = await fetch('/generate_tests', {
+            const response = await fetch('/generate/tests', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    code: generatedCode.querySelector('code').textContent,
+                    code: snippet.code,
                 }),
             });
             
@@ -327,12 +327,12 @@
             const testsElement = generatedTests.querySelector('code');
             testsElement.textContent = '';
 
-            const response = await fetch('/generate_tests_from_feedback', {
+            const response = await fetch('/generate/tests_from_feedback', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    code: generatedCode.querySelector('code').textContent,
-                    test_code: generatedTests.querySelector('code').textContent,
+                    code: snippet.code,
+                    test_code: snippet.test_code,
                     feedback: testsFeedback.value,
                 }),
             });
