@@ -2,8 +2,8 @@ const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   e2e: {
-    baseUrl: "http://localhost:8000",
-    specPattern: "**/*.spec.js",
+    baseUrl: "http://localhost:8001",
+    specPattern: "ui/*.spec.js",
     supportFile: false,
     video: true,
   },
