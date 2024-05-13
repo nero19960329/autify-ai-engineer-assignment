@@ -16,7 +16,7 @@ async def fake_stream_data(data: str):
 
 @router.post("/title")
 async def generate_title(title_gen_data: schemas.TitleGenRequest):
-    fake_title = "Add two numbers"
+    fake_title = "Divide two numbers"
     return StreamingResponse(
         fake_stream_data(fake_title), media_type="text/event-stream"
     )
@@ -24,7 +24,7 @@ async def generate_title(title_gen_data: schemas.TitleGenRequest):
 
 @router.post("/code")
 async def generate_code(code_gen_data: schemas.CodeGenRequest):
-    fake_code = "def sum(a, b):\n    return a + b"
+    fake_code = "def div(a, b):\n    return a / b"
     return StreamingResponse(
         fake_stream_data(fake_code), media_type="text/event-stream"
     )
@@ -37,7 +37,7 @@ async def detect_language(language_gen_data: schemas.LanguageDetRequest):
 
 @router.post("/code_from_feedback")
 async def generate_code_from_feedback(feedback_data: schemas.CodeFeedbackRequest):
-    fake_code = "def sum(a: int, b: int) -> int:\n    return a + b"
+    fake_code = "def div(a: int, b: int) -> float:\n    return a / b"
     return StreamingResponse(
         fake_stream_data(fake_code), media_type="text/event-stream"
     )
@@ -45,7 +45,7 @@ async def generate_code_from_feedback(feedback_data: schemas.CodeFeedbackRequest
 
 @router.post("/tests")
 async def generate_tests(test_gen_data: schemas.TestGenRequest):
-    fake_code = "assert sum(1, 2) == 3"
+    fake_code = "assert div(2, 1) == 1"
     return StreamingResponse(
         fake_stream_data(fake_code), media_type="text/event-stream"
     )
@@ -53,7 +53,15 @@ async def generate_tests(test_gen_data: schemas.TestGenRequest):
 
 @router.post("/tests_from_feedback")
 async def generate_tests_from_feedback(feedback_data: schemas.TestsFeedbackRequest):
-    fake_code = "assert sum(1, 2) == 3\nassert sum(2, 3) == 5"
+    fake_code = "assert div(2, 1) == 2\nassert div(1, 0) == 0"
+    return StreamingResponse(
+        fake_stream_data(fake_code), media_type="text/event-stream"
+    )
+
+
+@router.post("/regenerate")
+async def regenerate_code(regenerate_data: schemas.RegenerateRequest):
+    fake_code = "def div(a: int, b: int) -> float:\n    return a / b if b else 0"
     return StreamingResponse(
         fake_stream_data(fake_code), media_type="text/event-stream"
     )

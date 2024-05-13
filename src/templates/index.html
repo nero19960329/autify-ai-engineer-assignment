@@ -44,8 +44,8 @@
                 </div>
                 <button id="run-tests-btn" class="w-full bg-teal-500 text-white px-4 py-2 rounded mb-4">Run Test Code</button>
                 <div id="test-results" class="p-4 rounded mb-4"></div>
-                <button id="regenerate-btn" class="w-full bg-gray-500 text-white px-4 py-2 rounded mb-4" disabled>
-                    Regenerate (Enabled when failed; Send failed feedback to Regenerate)
+                <button id="regenerate-btn" class="w-full text-white px-4 py-2 rounded mb-4" disabled>
+                    Regenerate
                 </button>
             </div>
         </div>
@@ -372,10 +372,47 @@
                     ${data.message}
                 </div>
             `;
+            if (data.result !== 'success') {
+                regenerateBtn.classList.remove('bg-gray-500');
+                regenerateBtn.classList.add('bg-green-500');
+            } else {
+                regenerateBtn.classList.remove('bg-green-500');
+                regenerateBtn.classList.add('bg-gray-500');
+            }
             regenerateBtn.disabled = data.result === 'success';
         }
 
         runTestsBtn.addEventListener('click', runTests);
+
+        async function regenerateCode() {
+            const snippet = snippets.find(s => s.id === currentSnippetId);
+
+            const codeElement = generatedCode.querySelector('code');
+            codeElement.textContent = '';
+
+            const response = await fetch('/generate/regenerate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    description: codeDescription.value,
+                    code: snippet.code,
+                    feedback: codeFeedback.value,
+                    test_code: generatedTests.querySelector('code').textContent,
+                    test_feedback: testsFeedback.value,
+                    error_message: snippet.test_result_message,
+                }),
+            });
+
+            const codeData = await streamResponse(response, data => {
+                codeElement.textContent += data;
+                highlightCode(codeElement);
+            });
+
+            snippet.code = codeData;
+            await updateSnippet(snippet);
+        }
+
+        regenerateBtn.addEventListener('click', regenerateCode);
 
         document.addEventListener('DOMContentLoaded', async () => {
             snippets = await fetchSnippets();
