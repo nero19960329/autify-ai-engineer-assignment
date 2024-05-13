@@ -33,20 +33,26 @@
                     <input type="text" id="code-feedback" placeholder="Provide feedback for regenerating code..." class="code-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
                     <button id="improve-code-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Improve Code</button>
                 </div>
-                <button id="generate-tests-btn" class="w-full bg-purple-500 text-white px-4 py-2 rounded mb-4">Generate Test Cases</button>
+                
+                <div id="test-generation-section" style="display: none;">
+                    <hr class="mb-4 border-t-2 border-gray-300">
 
-                <hr class="mb-4 border-t-2 border-gray-300">
+                    <button id="generate-tests-btn" class="w-full bg-purple-500 text-white px-4 py-2 rounded mb-4">Generate Test Cases</button>
 
-                <pre id="generated-tests" class="mb-2"><code class="python"></code></pre>
-                <div class="flex justify-between mb-4">
-                    <input type="text" id="tests-feedback" placeholder="Provide feedback for regenerating test cases..." class="tests-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
-                    <button id="improve-tests-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Improve Tests</button>
+                    <pre id="generated-tests" class="mb-2"><code class="python"></code></pre>
+                    <div class="flex justify-between mb-4">
+                        <input type="text" id="tests-feedback" placeholder="Provide feedback for regenerating test cases..." class="tests-feedback flex-grow mr-2 p-2 border border-gray-300 rounded">
+                        <button id="improve-tests-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Improve Tests</button>
+                    </div>
+                    <button id="run-tests-btn" class="w-full bg-teal-500 text-white px-4 py-2 rounded mb-4">Run Test Code</button>
+                    <div id="test-results" class="p-4 rounded mb-4"></div>
                 </div>
-                <button id="run-tests-btn" class="w-full bg-teal-500 text-white px-4 py-2 rounded mb-4">Run Test Code</button>
-                <div id="test-results" class="p-4 rounded mb-4"></div>
-                <button id="regenerate-btn" class="w-full text-white px-4 py-2 rounded mb-4" disabled>
-                    Regenerate
-                </button>
+
+                <div id="regeneration-section" style="display: none;">
+                    <button id="regenerate-btn" class="w-full text-white px-4 py-2 rounded mb-4" disabled>
+                        Regenerate
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -70,6 +76,38 @@
         const runTestsBtn = document.getElementById('run-tests-btn');
         const testResults = document.getElementById('test-results');
         const regenerateBtn = document.getElementById('regenerate-btn');
+
+        function updateSectionsVisibility(testResult) {
+            const codeGenerationSection = document.getElementById('code-generation-section');
+            const testGenerationSection = document.getElementById('test-generation-section');
+            const regenerationSection = document.getElementById('regeneration-section');
+
+            const generatedCodeElement = generatedCode.querySelector('code');
+            const generatedTestsElement = generatedTests.querySelector('code');
+            const testResults = document.getElementById('test-results');
+
+            if (generatedCodeElement.textContent.trim() !== '') {
+                testGenerationSection.style.display = 'block';
+            } else {
+                testGenerationSection.style.display = 'none';
+            }
+
+            if (generatedTestsElement.textContent.trim() !== '') {
+                regenerationSection.style.display = 'block';
+            } else {
+                regenerationSection.style.display = 'none';
+            }
+
+            if (testResult === 'failure') {
+                regenerateBtn.disabled = false;
+                regenerateBtn.classList.remove('bg-gray-500');
+                regenerateBtn.classList.add('bg-green-500');
+            } else if (testResult === 'success') {
+                regenerateBtn.disabled = true;
+                regenerateBtn.classList.remove('bg-green-500');
+                regenerateBtn.classList.add('bg-gray-500');
+            }
+        }
 
         async function fetchSnippets() {
             const response = await fetch('/snippets');
@@ -119,6 +157,8 @@
 
             highlightCode(generatedCode.querySelector('code'));
             highlightCode(generatedTests.querySelector('code'));
+
+            updateSectionsVisibility();
         }
 
         async function createSnippet() {
@@ -239,6 +279,7 @@
             const codeData = await streamResponse(codeResponse, data => {
                 codeElement.textContent += data;
                 highlightCode(codeElement);
+                updateSectionsVisibility();
             });
             snippet.code = codeData;
 
@@ -317,6 +358,7 @@
             const testsData = await streamResponse(response, data => {
                 testsElement.textContent += data;
                 highlightCode(testsElement);
+                updateSectionsVisibility();
             });
 
             snippet.test_code = testsData;
@@ -372,14 +414,7 @@
                     ${data.message}
                 </div>
             `;
-            if (data.result !== 'success') {
-                regenerateBtn.classList.remove('bg-gray-500');
-                regenerateBtn.classList.add('bg-green-500');
-            } else {
-                regenerateBtn.classList.remove('bg-green-500');
-                regenerateBtn.classList.add('bg-gray-500');
-            }
-            regenerateBtn.disabled = data.result === 'success';
+            updateSectionsVisibility(data.result);
         }
 
         runTestsBtn.addEventListener('click', runTests);
