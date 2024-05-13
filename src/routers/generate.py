@@ -17,7 +17,7 @@ def load_system_prompt(filename):
 
 async def chatgpt_stream_response(messages):
     client = openai.AsyncOpenAI(
-        base_url="https://ai-yyds.com/v1",
+        base_url=os.environ.get("OPENAI_API_BASE", openai.NOT_GIVEN),
     )
 
     stream = await client.chat.completions.create(
@@ -33,7 +33,7 @@ async def chatgpt_stream_response(messages):
 
 async def chatgpt_response(messages, response_format=openai.NOT_GIVEN):
     client = openai.OpenAI(
-        base_url="https://ai-yyds.com/v1",
+        base_url=os.environ.get("OPENAI_API_BASE", openai.NOT_GIVEN),
     )
 
     response = client.chat.completions.create(
@@ -51,7 +51,7 @@ async def generate_title(title_gen_data: schemas.TitleGenRequest):
         {"role": "system", "content": load_system_prompt("generate_title.txt")},
         {
             "role": "user",
-            "content": f"Generate a title for the following code description:\n\n{title_gen_data.description}",
+            "content": json.dumps({"description": title_gen_data.description}),
         },
     ]
 
@@ -66,7 +66,7 @@ async def generate_code(code_gen_data: schemas.CodeGenRequest):
         {"role": "system", "content": load_system_prompt("generate_code.txt")},
         {
             "role": "user",
-            "content": f"Generate code for the following description:\n\n{code_gen_data.description}",
+            "content": json.dumps({"description": code_gen_data.description}),
         },
     ]
 
@@ -81,7 +81,12 @@ async def detect_language(language_gen_data: schemas.LanguageDetRequest):
         {"role": "system", "content": load_system_prompt("detect_language.txt")},
         {
             "role": "user",
-            "content": f"Detect the programming language of the following code:\n\n{language_gen_data.code}",
+            "content": json.dumps(
+                {
+                    "description": language_gen_data.description,
+                    "code": language_gen_data.code,
+                }
+            ),
         },
     ]
 
@@ -98,11 +103,15 @@ async def generate_code_from_feedback(feedback_data: schemas.CodeFeedbackRequest
         },
         {
             "role": "user",
-            "content": f"Here is a function:\n\n{feedback_data.code}\n\nHere is some feedback on how to improve it:\n\n{feedback_data.feedback}",
+            "content": json.dumps(
+                {
+                    "description": feedback_data.description,
+                    "code": feedback_data.code,
+                    "feedback": feedback_data.feedback,
+                }
+            ),
         },
     ]
-
-    print(messages)
 
     return StreamingResponse(
         chatgpt_stream_response(messages), media_type="text/event-stream"
@@ -115,7 +124,13 @@ async def generate_tests(test_gen_data: schemas.TestGenRequest):
         {"role": "system", "content": load_system_prompt("generate_tests.txt")},
         {
             "role": "user",
-            "content": f"Generate test cases for the following code:\n\n{test_gen_data.code}",
+            "content": json.dumps(
+                {
+                    "description": test_gen_data.description,
+                    "code": test_gen_data.code,
+                    "feedback": test_gen_data.feedback,
+                }
+            ),
         },
     ]
 
@@ -133,7 +148,15 @@ async def generate_tests_from_feedback(feedback_data: schemas.TestsFeedbackReque
         },
         {
             "role": "user",
-            "content": f"Here is some code:\n\n{feedback_data.code}\n\nAnd here are the existing test cases:\n\n{feedback_data.test_code}\n\nHere is some feedback on how to improve the test cases:\n\n{feedback_data.feedback}",
+            "content": json.dumps(
+                {
+                    "description": feedback_data.description,
+                    "code": feedback_data.code,
+                    "feedback": feedback_data.feedback,
+                    "test_code": feedback_data.test_code,
+                    "test_feedback": feedback_data.test_feedback,
+                }
+            ),
         },
     ]
 

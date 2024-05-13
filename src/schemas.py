@@ -39,7 +39,7 @@ class LanguageDetRequest(BaseModel):
 
 
 class LanguageDetResponse(BaseModel):
-    language: str
+    language: str | None
 
 
 class CodeGenRequest(BaseModel):
@@ -51,18 +51,23 @@ class TitleGenRequest(BaseModel):
 
 
 class CodeFeedbackRequest(BaseModel):
+    description: str
     code: str
     feedback: str
 
 
 class TestGenRequest(BaseModel):
+    description: str
     code: str
+    feedback: str
 
 
 class TestsFeedbackRequest(BaseModel):
+    description: str
     code: str
-    test_code: str
     feedback: str
+    test_code: str
+    test_feedback: str
 
 
 class TestRunRequest(BaseModel):
