@@ -279,6 +279,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
+                    description: codeDescription.value,
                     code: snippet.code,
                     feedback: codeFeedback.value,
                 }),
@@ -305,7 +306,9 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
+                    description: codeDescription.value,
                     code: snippet.code,
+                    feedback: codeFeedback.value,
                 }),
             });
             
@@ -331,9 +334,11 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
+                    description: codeDescription.value,
                     code: snippet.code,
+                    feedback: codeFeedback.value,
                     test_code: snippet.test_code,
-                    feedback: testsFeedback.value,
+                    test_feedback: testsFeedback.value,
                 }),
             });
 
