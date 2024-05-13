@@ -17,7 +17,7 @@ def load_system_prompt(filename):
 
 async def chatgpt_stream_response(messages):
     client = openai.AsyncOpenAI(
-        base_url="https://ai-yyds.com/v1",
+        base_url=os.environ.get("OPENAI_API_BASE", openai.NOT_GIVEN),
     )
 
     stream = await client.chat.completions.create(
@@ -33,7 +33,7 @@ async def chatgpt_stream_response(messages):
 
 async def chatgpt_response(messages, response_format=openai.NOT_GIVEN):
     client = openai.OpenAI(
-        base_url="https://ai-yyds.com/v1",
+        base_url=os.environ.get("OPENAI_API_BASE", openai.NOT_GIVEN),
     )
 
     response = client.chat.completions.create(
