@@ -39,7 +39,7 @@ class LanguageDetRequest(BaseModel):
 
 
 class LanguageDetResponse(BaseModel):
-    language: str
+    language: str | None
 
 
 class CodeGenRequest(BaseModel):

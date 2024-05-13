@@ -218,34 +218,34 @@
 
             const codeElement = generatedCode.querySelector('code');
             codeElement.textContent = '';
-            
-            const codeResponse = await fetch('/generate/code', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    description: codeDescription.value,
+
+            const [codeResponse, titleResponse] = await Promise.all([
+                fetch('/generate/code', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        description: codeDescription.value,
+                    }),
                 }),
-            });
+                fetch('/generate/title', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        description: codeDescription.value,
+                    }),
+                }),
+            ]);
 
             const codeData = await streamResponse(codeResponse, data => {
                 codeElement.textContent += data;
                 highlightCode(codeElement);
             });
             snippet.code = codeData;
-            
-            if (!snippet.title) {
-                const titleResponse = await fetch('/generate/title', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        description: codeDescription.value,
-                    }),
-                });
-                const titleData = await streamResponse(titleResponse, data => {
-                    snippet.title += data;
-                    updateSnippet(snippet);
-                });
-            }
+
+            const titleData = await streamResponse(titleResponse, data => {
+                snippet.title += data;
+                updateSnippet(snippet);
+            });
 
             const langResponse = await fetch('/generate/detect_language', {
                 method: 'POST',
@@ -257,10 +257,12 @@
             });
             const langData = await langResponse.json();
             if (langData.language !== snippet.language) {
-                snippet.language = langData.language;
+                snippet.language = langData.language || '';
                 await updateSnippet(snippet);
             }
-            codeElement.className = langData.language;
+            if (langData.language) {
+                codeElement.className = langData.language;
+            }
             highlightCode(codeElement);
 
             await updateSnippet(snippet);
