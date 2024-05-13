@@ -163,3 +163,27 @@ async def generate_tests_from_feedback(feedback_data: schemas.TestsFeedbackReque
     return StreamingResponse(
         chatgpt_stream_response(messages), media_type="text/event-stream"
     )
+
+
+@router.post("/regenerate")
+async def regenerate_code(regenerate_data: schemas.RegenerateRequest):
+    messages = [
+        {"role": "system", "content": load_system_prompt("regenerate.txt")},
+        {
+            "role": "user",
+            "content": json.dumps(
+                {
+                    "description": regenerate_data.description,
+                    "code": regenerate_data.code,
+                    "feedback": regenerate_data.feedback,
+                    "test_code": regenerate_data.test_code,
+                    "test_feedback": regenerate_data.test_feedback,
+                    "error_message": regenerate_data.error_message,
+                }
+            ),
+        },
+    ]
+
+    return StreamingResponse(
+        chatgpt_stream_response(messages), media_type="text/event-stream"
+    )

@@ -75,3 +75,12 @@ class TestRunRequest(BaseModel):
     code: str
     test_code: str
     language: str
+
+
+class RegenerateRequest(BaseModel):
+    description: str
+    code: str
+    feedback: str
+    test_code: str
+    test_feedback: str
+    error_message: str
