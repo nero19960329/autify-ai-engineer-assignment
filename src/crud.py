@@ -1,3 +1,8 @@
+"""
+This module provides CRUD (Create, Read, Update, Delete) operations for the Snippet model.
+It interacts with the database using SQLAlchemy sessions.
+"""
+
 from sqlalchemy.orm import Session
 
 from src import models, schemas

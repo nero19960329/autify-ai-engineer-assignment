@@ -1,3 +1,8 @@
+"""
+This module defines the endpoints for CRUD operations on code snippets.
+It includes endpoints for creating, retrieving, updating, and deleting snippets.
+"""
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 

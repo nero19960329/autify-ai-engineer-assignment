@@ -1,3 +1,8 @@
+"""
+This module sets up the database connection and provides a database session generator.
+It uses SQLAlchemy to create an engine and a session factory.
+"""
+
 import os
 
 from sqlalchemy import create_engine

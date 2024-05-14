@@ -1,3 +1,8 @@
+"""
+This module defines the database models using SQLAlchemy's declarative base.
+It includes the Snippet model, which represents a code snippet with associated metadata.
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, Text, DateTime

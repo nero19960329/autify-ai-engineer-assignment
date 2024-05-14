@@ -1,3 +1,8 @@
+"""
+This module defines the endpoints for generating code snippets, titles, and tests.
+It also includes endpoints for detecting languages and improving code and tests based on feedback.
+"""
+
 import json
 import os
 
@@ -15,10 +20,20 @@ def load_system_prompt(filename):
         return f.read().strip()
 
 
-async def chatgpt_stream_response(messages):
+async def chatgpt_stream_response(messages: list):
+    """
+    Send messages to the ChatGPT API and stream the response.
+
+    Args:
+        messages (list): The list of messages to send to the ChatGPT API.
+
+    Yields:
+        str: The content of each chunk in the stream response.
+    """
+
     client = openai.AsyncOpenAI()
     if os.getenv("OPENAI_API_BASE"):
-        client.base_url = os.getenv("OPENAI_API_BASE")
+        client.base_url = os.getenv("OPENAI_API_BASE")  # Set custom API base URL
 
     stream = await client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -28,10 +43,23 @@ async def chatgpt_stream_response(messages):
 
     async for chunk in stream:
         if chunk.choices[0].delta.content is not None:
-            yield chunk.choices[0].delta.content
+            yield chunk.choices[
+                0
+            ].delta.content  # Yield content of each chunk in the stream
 
 
-async def chatgpt_response(messages, response_format=None):
+async def chatgpt_response(messages: list, response_format: dict | None = None):
+    """
+    Send messages to the ChatGPT API and return the complete response.
+
+    Args:
+        messages (list): The list of messages to send to the ChatGPT API.
+        response_format (dict, optional): The format of the response. Defaults to None.
+
+    Returns:
+        str: The content of the response from the ChatGPT API.
+    """
+
     client = openai.OpenAI()
     if os.getenv("OPENAI_API_BASE"):
         client.base_url = os.getenv("OPENAI_API_BASE")

@@ -1,3 +1,8 @@
+"""
+This module defines the endpoint for running Python code snippets and their associated tests.
+It validates the input data and returns the test results.
+"""
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
