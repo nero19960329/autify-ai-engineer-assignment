@@ -225,6 +225,12 @@
             }
         });
 
+        function processCodeString(codeString) {
+            codeString = codeString.replace(/^```.*?\n/, '');
+            codeString = codeString.replace(/\n```$/, '');
+            return codeString;
+        }
+
         async function streamResponse(response, callback) {
             const reader = response.body.getReader();
             let decoder = new TextDecoder();
@@ -276,12 +282,17 @@
                 }),
             ]);
 
-            const codeData = await streamResponse(codeResponse, data => {
+            let codeData = await streamResponse(codeResponse, data => {
                 codeElement.textContent += data;
                 highlightCode(codeElement);
                 updateSectionsVisibility();
             });
+
+            codeData = processCodeString(codeData);
             snippet.code = codeData;
+            codeElement.textContent = codeData;
+            console.log("codeElement.textContent", codeElement.textContent);
+            highlightCode(codeElement);
 
             const titleData = await streamResponse(titleResponse, data => {
                 snippet.title += data;
@@ -328,12 +339,15 @@
                 }),
             });
 
-            const codeData = await streamResponse(response, data => {
+            let codeData = await streamResponse(response, data => {
                 codeElement.textContent += data;
                 highlightCode(codeElement);
             });
 
+            codeData = processCodeString(codeData);
             snippet.code = codeData;
+            codeElement.textContent = codeData;
+            highlightCode(codeElement);
             await updateSnippet(snippet);
         }
 
@@ -355,13 +369,16 @@
                 }),
             });
             
-            const testsData = await streamResponse(response, data => {
+            let testsData = await streamResponse(response, data => {
                 testsElement.textContent += data;
                 highlightCode(testsElement);
                 updateSectionsVisibility();
             });
 
+            testsData = processCodeString(testsData);
             snippet.test_code = testsData;
+            testsElement.textContent = testsData;
+            highlightCode(testsElement);
             await updateSnippet(snippet);
         }
 
@@ -386,12 +403,15 @@
                 }),
             });
 
-            const testsData = await streamResponse(response, data => {
+            let testsData = await streamResponse(response, data => {
                 testsElement.textContent += data;
                 highlightCode(testsElement);
             });
 
+            testsData = processCodeString(testsData);
             snippet.test_code = testsData;
+            testsElement.textContent = testsData;
+            highlightCode(testsElement);
             await updateSnippet(snippet);
         }
 
@@ -438,12 +458,15 @@
                 }),
             });
 
-            const codeData = await streamResponse(response, data => {
+            let codeData = await streamResponse(response, data => {
                 codeElement.textContent += data;
                 highlightCode(codeElement);
             });
 
+            codeData = processCodeString(codeData);
             snippet.code = codeData;
+            codeElement.textContent = codeData;
+            highlightCode(codeElement);
             await updateSnippet(snippet);
         }
 
