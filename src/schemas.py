@@ -35,7 +35,6 @@ class Snippet(SnippetCreate):
 
 class LanguageDetRequest(BaseModel):
     description: str
-    code: str
 
 
 class LanguageDetResponse(BaseModel):
@@ -53,18 +52,21 @@ class TitleGenRequest(BaseModel):
 class CodeFeedbackRequest(BaseModel):
     description: str
     code: str
+    language: str
     feedback: str
 
 
 class TestGenRequest(BaseModel):
     description: str
     code: str
+    language: str
     feedback: str
 
 
 class TestsFeedbackRequest(BaseModel):
     description: str
     code: str
+    language: str
     feedback: str
     test_code: str
     test_feedback: str
@@ -73,13 +75,14 @@ class TestsFeedbackRequest(BaseModel):
 class TestRunRequest(BaseModel):
     snippet_id: int
     code: str
-    test_code: str
     language: str
+    test_code: str
 
 
 class RegenerateRequest(BaseModel):
     description: str
     code: str
+    language: str
     feedback: str
     test_code: str
     test_feedback: str

@@ -16,9 +16,9 @@ def load_system_prompt(filename):
 
 
 async def chatgpt_stream_response(messages):
-    client = openai.AsyncOpenAI(
-        base_url=os.environ.get("OPENAI_API_BASE", openai.NOT_GIVEN),
-    )
+    client = openai.AsyncOpenAI()
+    if os.getenv("OPENAI_API_BASE"):
+        client.base_url = os.getenv("OPENAI_API_BASE")
 
     stream = await client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -31,14 +31,14 @@ async def chatgpt_stream_response(messages):
             yield chunk.choices[0].delta.content
 
 
-async def chatgpt_response(messages, response_format=openai.NOT_GIVEN):
-    client = openai.OpenAI(
-        base_url=os.environ.get("OPENAI_API_BASE", openai.NOT_GIVEN),
-    )
+async def chatgpt_response(messages, response_format=None):
+    client = openai.OpenAI()
+    if os.getenv("OPENAI_API_BASE"):
+        client.base_url = os.getenv("OPENAI_API_BASE")
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        response_format=response_format,
+        response_format=response_format or {},
         messages=messages,
     )
 
@@ -81,12 +81,7 @@ async def detect_language(language_gen_data: schemas.LanguageDetRequest):
         {"role": "system", "content": load_system_prompt("detect_language.txt")},
         {
             "role": "user",
-            "content": json.dumps(
-                {
-                    "description": language_gen_data.description,
-                    "code": language_gen_data.code,
-                }
-            ),
+            "content": json.dumps({"description": language_gen_data.description}),
         },
     ]
 
@@ -107,6 +102,7 @@ async def generate_code_from_feedback(feedback_data: schemas.CodeFeedbackRequest
                 {
                     "description": feedback_data.description,
                     "code": feedback_data.code,
+                    "language": feedback_data.language,
                     "feedback": feedback_data.feedback,
                 }
             ),
@@ -128,6 +124,7 @@ async def generate_tests(test_gen_data: schemas.TestGenRequest):
                 {
                     "description": test_gen_data.description,
                     "code": test_gen_data.code,
+                    "language": test_gen_data.language,
                     "feedback": test_gen_data.feedback,
                 }
             ),
@@ -152,6 +149,7 @@ async def generate_tests_from_feedback(feedback_data: schemas.TestsFeedbackReque
                 {
                     "description": feedback_data.description,
                     "code": feedback_data.code,
+                    "language": feedback_data.language,
                     "feedback": feedback_data.feedback,
                     "test_code": feedback_data.test_code,
                     "test_feedback": feedback_data.test_feedback,
@@ -175,6 +173,7 @@ async def regenerate_code(regenerate_data: schemas.RegenerateRequest):
                 {
                     "description": regenerate_data.description,
                     "code": regenerate_data.code,
+                    "language": regenerate_data.language,
                     "feedback": regenerate_data.feedback,
                     "test_code": regenerate_data.test_code,
                     "test_feedback": regenerate_data.test_feedback,

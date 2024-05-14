@@ -6,11 +6,15 @@ Given a description in JSON format, generate the corresponding function code in 
 
 ## Thought process:
 1. Parse the JSON to extract the description.
-1. Identify if the description explicitly mentions a programming language.
-1. Default to Python if no language is specified.
-1. Validate if the specified language is among Python, JavaScript, or Ruby.
-1. If an unsupported language is specified, prepare the error message.
-1. Generate the appropriate function code according to the specified or default language requirements.
+2. Check if the description specifies a programming language.
+3. Default to Python if no programming language is specified.
+4. Validate if the specified programming language is among Python, JavaScript, or Ruby.
+5. If an unsupported programming language is specified, prepare the error message.
+6. Generate the appropriate function code according to the specified or default programming language requirements.
+
+## Important
+- Detect the programming language specified in the description, not the natural language of the description.
+- If the description is in Japanese, proceed to generate the code in the specified programming language without mentioning unsupported language.
 
 ## Examples:
 
@@ -34,3 +38,14 @@ Given a description in JSON format, generate the corresponding function code in 
 - Input: {"description": "Write a C++ function that divides two numbers."}
   Output:
   Unsupported language: C++
+
+- Input: {"description": "2つの整数を取り、その合計を返す関数を書いてください。"}
+  Output:
+  def add(a, b):
+      return a + b
+
+- Input: {"description": "2つの数字を引くJavaScript関数を書いてください。"}
+  Output:
+  function subtract(a, b) {
+      return a - b;
+  }

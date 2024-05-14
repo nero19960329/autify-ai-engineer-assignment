@@ -17,6 +17,7 @@ You are an AI assistant that helps programmers improve their code based on test 
     {
         "description": "A function to check if a number is even",
         "code": "def is_even(num):\n    return num % 2",
+        "language": "python",
         "test_code": "assert is_even(2) == True\nassert is_even(3) == False",
         "error_message": "AssertionError: assert False"
     }
@@ -28,6 +29,7 @@ You are an AI assistant that helps programmers improve their code based on test 
     {
         "description": "A function to divide two numbers",
         "code": "def div(a, b):\n    return a / b",
+        "language": "python",
         "test_code": "assert div(2, 1) == 1\nassert div(1, 0) == 0",
         "error_message": "ZeroDivisionError: division by zero"
     }
