@@ -123,7 +123,7 @@
         }
 
         async function fetchSnippets() {
-            const response = await fetch('/snippets');
+            const response = await fetch('/api/snippets');
             if (!response.ok) {
                 console.error('Failed to fetch snippets:', response.status);
                 return [];
@@ -175,7 +175,7 @@
         }
 
         async function createSnippet() {
-            const response = await fetch('/snippets', {
+            const response = await fetch('/api/snippets', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({}),
@@ -191,7 +191,7 @@
         createBtn.addEventListener('click', createSnippet);
 
         async function updateSnippet(snippet) {
-            await fetch(`/snippets/${snippet.id}`, {
+            await fetch(`/api/snippets/${snippet.id}`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(snippet),
@@ -200,7 +200,7 @@
         }
 
         async function deleteSnippet(id) {
-            const response = await fetch(`/snippets/${id}`, {method: 'DELETE'});
+            const response = await fetch(`/api/snippets/${id}`, {method: 'DELETE'});
             if (!response.ok) {
                 console.error('Failed to delete snippet:', response.status);
             }
@@ -208,7 +208,7 @@
         }
 
         async function fetchSnippetDetail(id) {
-            const response = await fetch(`/snippets/${id}`);
+            const response = await fetch(`/api/snippets/${id}`);
             if (!response.ok) {
                 console.error('Failed to fetch snippet detail:', response.status);
                 return null;
@@ -279,21 +279,21 @@
             codeElement.textContent = '';
 
             const [codeResponse, titleResponse, langPromise] = [
-                fetch('/generate/code', {
+                fetch('/api/generate/code', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         description: codeDescription.value,
                     }),
                 }),
-                fetch('/generate/title', {
+                fetch('/api/generate/title', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         description: codeDescription.value,
                     }),
                 }),
-                fetch('/generate/detect_language', {
+                fetch('/api/generate/detect_language', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -349,7 +349,7 @@
             const codeElement = generatedCode.querySelector('code');
             codeElement.textContent = '';
 
-            const response = await fetch('/generate/code_from_feedback', {
+            const response = await fetch('/api/generate/code_from_feedback', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -380,7 +380,7 @@
             const testsElement = generatedTests.querySelector('code');
             testsElement.textContent = '';
 
-            const response = await fetch('/generate/tests', {
+            const response = await fetch('/api/generate/tests', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -413,7 +413,7 @@
             const testsElement = generatedTests.querySelector('code');
             testsElement.textContent = '';
 
-            const response = await fetch('/generate/tests_from_feedback', {
+            const response = await fetch('/api/generate/tests_from_feedback', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -443,7 +443,7 @@
         async function runTests() {
             const snippet = snippets.find(s => s.id === currentSnippetId);
 
-            const response = await fetch('/run/python', {
+            const response = await fetch('/api/run/python', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -470,7 +470,7 @@
             const codeElement = generatedCode.querySelector('code');
             codeElement.textContent = '';
 
-            const response = await fetch('/generate/regenerate', {
+            const response = await fetch('/api/generate/regenerate', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({

@@ -1,9 +1,9 @@
 describe("Code Snippet Generator E2E Tests", () => {
   // Setup before each test
   beforeEach(() => {
-    cy.request("GET", "/snippets").then((response) => {
+    cy.request("GET", "/api/snippets").then((response) => {
       response.body.forEach((snippet) => {
-        cy.request("DELETE", `/snippets/${snippet.id}`);
+        cy.request("DELETE", `/api/snippets/${snippet.id}`);
       });
     });
     cy.visit("/");
@@ -98,17 +98,17 @@ describe("Code Snippet Generator E2E Tests", () => {
 
   it("should display test generation section after code generation", () => {
     // Simulate code generation
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b): return a + b",
     }).as("generateCode");
 
     // Simulate title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Simulate language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguage");
 
@@ -126,17 +126,17 @@ describe("Code Snippet Generator E2E Tests", () => {
 
   it("should retain test generation section visibility after improving code", () => {
     // Simulate code generation
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b): return a + b",
     }).as("generateCode");
 
     // Simulate title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Simulate language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguage");
 
@@ -152,7 +152,7 @@ describe("Code Snippet Generator E2E Tests", () => {
     cy.get("#test-generation-section").should("be.visible");
 
     // Improve code
-    cy.intercept("POST", "/generate/code_from_feedback", {
+    cy.intercept("POST", "/api/generate/code_from_feedback", {
       body: "def add(a: int, b: int) -> int: return a + b",
     }).as("improveCode");
 
@@ -170,17 +170,17 @@ describe("Code Snippet Generator E2E Tests", () => {
 
   it("should handle multiple code generations and retain test generation section visibility", () => {
     // Simulate initial code generation
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b): return a + b",
     }).as("generateCode");
 
     // Simulate initial title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Simulate initial language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguage");
 
@@ -196,17 +196,17 @@ describe("Code Snippet Generator E2E Tests", () => {
     cy.get("#test-generation-section").should("be.visible");
 
     // Simulate second code generation
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def subtract(a, b): return a - b",
     }).as("generateCodeAgain");
 
     // Simulate second title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Subtraction Function",
     }).as("generateTitleAgain");
 
     // Simulate second language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguageAgain");
 
@@ -228,17 +228,17 @@ describe("Code Snippet Generator E2E Tests", () => {
 
   it("should enable the regenerate button when tests fail", () => {
     // Simulate code generation
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b): return a + b",
     }).as("generateCode");
 
     // Simulate title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Simulate language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguage");
 
@@ -254,7 +254,7 @@ describe("Code Snippet Generator E2E Tests", () => {
     cy.get("#test-generation-section").should("be.visible");
 
     // Simulate test generation
-    cy.intercept("POST", "/generate/tests", {
+    cy.intercept("POST", "/api/generate/tests", {
       body: "assert add(1, 2) == 3",
     }).as("generateTests");
 
@@ -264,7 +264,7 @@ describe("Code Snippet Generator E2E Tests", () => {
     cy.get("#generated-tests code").should("not.be.empty");
 
     // Simulate running tests with a failing test case
-    cy.intercept("POST", "/run_tests", {
+    cy.intercept("POST", "/api/run/python", {
       body: {
         result: "failure",
         message: "AssertionError: assert add(1, 2) == 3",
@@ -284,17 +284,17 @@ describe("Code Snippet Generator E2E Tests", () => {
 
   it("should disable the regenerate button when tests pass", () => {
     // Simulate code generation
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b): return a + b",
     }).as("generateCode");
 
     // Simulate title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Simulate language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguage");
 
@@ -310,7 +310,7 @@ describe("Code Snippet Generator E2E Tests", () => {
     cy.get("#test-generation-section").should("be.visible");
 
     // Simulate test generation
-    cy.intercept("POST", "/generate/tests", {
+    cy.intercept("POST", "/api/generate/tests", {
       body: "assert add(1, 2) == 3",
     }).as("generateTests");
 
@@ -320,7 +320,7 @@ describe("Code Snippet Generator E2E Tests", () => {
     cy.get("#generated-tests code").should("not.be.empty");
 
     // Simulate running tests with a passing test case
-    cy.intercept("POST", "/run_tests", {
+    cy.intercept("POST", "/api/run/python", {
       body: {
         result: "success",
         message: "Code Executed Successfully",
@@ -337,17 +337,17 @@ describe("Code Snippet Generator E2E Tests", () => {
 
   it("should highlight generated Python code correctly", () => {
     // Simulate code generation for Python
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b): return a + b",
     }).as("generateCode");
 
     // Simulate title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Simulate language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguage");
 
@@ -370,17 +370,17 @@ describe("Code Snippet Generator E2E Tests", () => {
 
   it("should highlight generated JavaScript code correctly", () => {
     // Simulate code generation for JavaScript
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "function add(a, b) { return a + b; }",
     }).as("generateCode");
 
     // Simulate title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Simulate language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "javascript"}',
     }).as("detectLanguage");
 
@@ -405,17 +405,17 @@ describe("Code Snippet Generator E2E Tests", () => {
 
   it("should highlight generated Ruby code correctly", () => {
     // Simulate code generation for Ruby
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b)\n  a + b\nend",
     }).as("generateCode");
 
     // Simulate title generation
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Simulate language detection
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "ruby"}',
     }).as("detectLanguage");
 

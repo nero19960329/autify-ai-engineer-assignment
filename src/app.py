@@ -8,9 +8,9 @@ from src import models
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-app.include_router(snippets.router)
-app.include_router(generate.router)
-app.include_router(run.router)
+app.include_router(snippets.router, prefix="/api")
+app.include_router(generate.router, prefix="/api")
+app.include_router(run.router, prefix="/api")
 
 templates = Jinja2Templates(directory="src/templates")
 

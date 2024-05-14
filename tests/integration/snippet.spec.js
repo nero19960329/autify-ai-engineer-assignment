@@ -1,9 +1,9 @@
 describe("Snippet List Functionality", () => {
   // Setup before each test
   beforeEach(() => {
-    cy.request("GET", "/snippets").then((response) => {
+    cy.request("GET", "/api/snippets").then((response) => {
       response.body.forEach((snippet) => {
-        cy.request("DELETE", `/snippets/${snippet.id}`);
+        cy.request("DELETE", `/api/snippets/${snippet.id}`);
       });
     });
     cy.visit("/");
@@ -11,7 +11,7 @@ describe("Snippet List Functionality", () => {
 
   it("should be able to click and load previously generated snippets", () => {
     // Create a new snippet
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Test Snippet",
       language: "python",
       description: "This is a test snippet.",
@@ -38,13 +38,13 @@ describe("Snippet List Functionality", () => {
 
   it("should be able to delete previously generated snippets", () => {
     // Create two new snippets
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Test Snippet 1",
       language: "python",
       description: "This is test snippet 1.",
       code: "print('Hello, world 1!')",
     });
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Test Snippet 2",
       language: "python",
       description: "This is test snippet 2.",
@@ -92,17 +92,17 @@ describe("Snippet List Functionality", () => {
     cy.get("#code-description").type("Write a function to add two numbers.");
 
     // Intercept the generate code API request
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b): return a + b",
     }).as("generateCode");
 
     // Intercept the generate title API request
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Intercept the detect language API request
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguage");
 
@@ -121,7 +121,7 @@ describe("Snippet List Functionality", () => {
     );
 
     // Verify that the snippet is saved and can be retrieved
-    cy.request("GET", "/snippets").then((response) => {
+    cy.request("GET", "/api/snippets").then((response) => {
       expect(response.body.length).to.equal(1);
       const snippet = response.body[0];
       expect(snippet.description).to.equal(
@@ -140,17 +140,17 @@ describe("Snippet List Functionality", () => {
     cy.get("#code-description").type("Write a function to add two numbers.");
 
     // Intercept the generate code API request
-    cy.intercept("POST", "/generate/code", {
+    cy.intercept("POST", "/api/generate/code", {
       body: "def add(a, b): return a + b",
     }).as("generateCode");
 
     // Intercept the generate title API request
-    cy.intercept("POST", "/generate/title", {
+    cy.intercept("POST", "/api/generate/title", {
       body: "Addition Function",
     }).as("generateTitle");
 
     // Intercept the detect language API request
-    cy.intercept("POST", "/generate/detect_language", {
+    cy.intercept("POST", "/api/generate/detect_language", {
       body: '{"language": "python"}',
     }).as("detectLanguage");
 
@@ -169,7 +169,7 @@ describe("Snippet List Functionality", () => {
     );
 
     // Verify that the snippet title and language are generated and saved
-    cy.request("GET", "/snippets").then((response) => {
+    cy.request("GET", "/api/snippets").then((response) => {
       expect(response.body.length).to.equal(1);
       const snippet = response.body[0];
       expect(snippet.title).to.equal("Addition Function");

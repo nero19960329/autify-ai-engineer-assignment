@@ -1,8 +1,8 @@
 describe("Code Generation Functionality", () => {
   beforeEach(() => {
-    cy.request("GET", "/snippets").then((response) => {
+    cy.request("GET", "/api/snippets").then((response) => {
       response.body.forEach((snippet) => {
-        cy.request("DELETE", `/snippets/${snippet.id}`);
+        cy.request("DELETE", `/api/snippets/${snippet.id}`);
       });
     });
     cy.visit("/");
@@ -14,9 +14,9 @@ describe("Code Generation Functionality", () => {
       "Write a Python function to add two numbers.",
     );
 
-    cy.intercept("POST", "/generate/code").as("generateCode");
-    cy.intercept("POST", "/generate/title").as("generateTitle");
-    cy.intercept("POST", "/generate/detect_language").as("detectLanguage");
+    cy.intercept("POST", "/api/generate/code").as("generateCode");
+    cy.intercept("POST", "/api/generate/title").as("generateTitle");
+    cy.intercept("POST", "/api/generate/detect_language").as("detectLanguage");
 
     cy.get("#generate-code-btn").click();
 
@@ -34,9 +34,9 @@ describe("Code Generation Functionality", () => {
       "Write a JavaScript function to add two numbers.",
     );
 
-    cy.intercept("POST", "/generate/code").as("generateCode");
-    cy.intercept("POST", "/generate/title").as("generateTitle");
-    cy.intercept("POST", "/generate/detect_language").as("detectLanguage");
+    cy.intercept("POST", "/api/generate/code").as("generateCode");
+    cy.intercept("POST", "/api/generate/title").as("generateTitle");
+    cy.intercept("POST", "/api/generate/detect_language").as("detectLanguage");
 
     cy.get("#generate-code-btn").click();
 
@@ -54,9 +54,9 @@ describe("Code Generation Functionality", () => {
       "Write a Ruby function to add two numbers.",
     );
 
-    cy.intercept("POST", "/generate/code").as("generateCode");
-    cy.intercept("POST", "/generate/title").as("generateTitle");
-    cy.intercept("POST", "/generate/detect_language").as("detectLanguage");
+    cy.intercept("POST", "/api/generate/code").as("generateCode");
+    cy.intercept("POST", "/api/generate/title").as("generateTitle");
+    cy.intercept("POST", "/api/generate/detect_language").as("detectLanguage");
 
     cy.get("#generate-code-btn").click();
 
@@ -69,7 +69,7 @@ describe("Code Generation Functionality", () => {
   });
 
   it("should improve Python code snippet with English feedback", () => {
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Addition Function",
       language: "python",
       description: "Write a Python function to add two numbers.",
@@ -83,7 +83,9 @@ describe("Code Generation Functionality", () => {
         "Add type hints to the function parameters and return type.",
       );
 
-      cy.intercept("POST", "/generate/code_from_feedback").as("improveCode");
+      cy.intercept("POST", "/api/generate/code_from_feedback").as(
+        "improveCode",
+      );
 
       cy.get("#improve-code-btn").click();
 
@@ -96,7 +98,7 @@ describe("Code Generation Functionality", () => {
   });
 
   it("should improve Python code snippet with Japanese feedback", () => {
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Addition Function",
       language: "python",
       description: "Write a Python function to add two numbers.",
@@ -110,7 +112,9 @@ describe("Code Generation Functionality", () => {
         "関数のパラメーターと戻り値に型ヒントを追加してください。",
       );
 
-      cy.intercept("POST", "/generate/code_from_feedback").as("improveCode");
+      cy.intercept("POST", "/api/generate/code_from_feedback").as(
+        "improveCode",
+      );
 
       cy.get("#improve-code-btn").click();
 
@@ -123,7 +127,7 @@ describe("Code Generation Functionality", () => {
   });
 
   it("should generate tests for a Python code snippet", () => {
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Addition Function",
       language: "python",
       description: "Write a Python function to add two numbers.",
@@ -133,7 +137,7 @@ describe("Code Generation Functionality", () => {
       cy.visit("/");
       cy.get(`a[data-id="${snippetId}"]`).click();
 
-      cy.intercept("POST", "/generate/tests").as("generateTests");
+      cy.intercept("POST", "/api/generate/tests").as("generateTests");
 
       cy.get("#generate-tests-btn").click();
 
@@ -145,7 +149,7 @@ describe("Code Generation Functionality", () => {
   });
 
   it("should improve Python tests with English feedback", () => {
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Addition Function",
       language: "python",
       description: "Write a Python function to add two numbers.",
@@ -158,7 +162,9 @@ describe("Code Generation Functionality", () => {
 
       cy.get("#tests-feedback").type("Add edge cases and error handling.");
 
-      cy.intercept("POST", "/generate/tests_from_feedback").as("improveTests");
+      cy.intercept("POST", "/api/generate/tests_from_feedback").as(
+        "improveTests",
+      );
 
       cy.get("#improve-tests-btn").click();
 
@@ -170,7 +176,7 @@ describe("Code Generation Functionality", () => {
   });
 
   it("should improve Python tests with Japanese feedback", () => {
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Addition Function",
       language: "python",
       description: "Write a Python function to add two numbers.",
@@ -185,7 +191,9 @@ describe("Code Generation Functionality", () => {
         "エッジケースとエラーハンドリングを追加してください。",
       );
 
-      cy.intercept("POST", "/generate/tests_from_feedback").as("improveTests");
+      cy.intercept("POST", "/api/generate/tests_from_feedback").as(
+        "improveTests",
+      );
 
       cy.get("#improve-tests-btn").click();
 
@@ -197,7 +205,7 @@ describe("Code Generation Functionality", () => {
   });
 
   it("should run tests to validate the Python code", () => {
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Addition Function",
       language: "python",
       description: "Write a Python function to add two numbers.",
@@ -208,7 +216,7 @@ describe("Code Generation Functionality", () => {
       cy.visit("/");
       cy.get(`a[data-id="${snippetId}"]`).click();
 
-      cy.intercept("POST", "/run/python").as("runTests");
+      cy.intercept("POST", "/api/run/python").as("runTests");
 
       cy.get("#run-tests-btn").click();
 
@@ -222,7 +230,7 @@ describe("Code Generation Functionality", () => {
   });
 
   it("should not enable the run tests button for non-Python code", () => {
-    cy.request("POST", "/snippets", {
+    cy.request("POST", "/api/snippets", {
       title: "Addition Function",
       language: "javascript",
       description: "Write a JavaScript function to add two numbers.",
