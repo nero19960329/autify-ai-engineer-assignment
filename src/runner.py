@@ -1,3 +1,8 @@
+"""
+This module provides a function to run Python code and tests in a secure subprocess.
+It sets resource limits (CPU time and memory) to prevent malicious or inefficient code execution.
+"""
+
 import os
 import resource
 import subprocess
@@ -11,6 +16,19 @@ def run_python_code(
     timeout_ms=5000,
     memory_limit_mb=256,
 ) -> dict:
+    """
+    Run Python code and test code in a secure subprocess with resource limits.
+
+    Args:
+        code (str): The Python code to run.
+        test_code (str): The Python test code to run.
+        timeout_ms (int, optional): The timeout in milliseconds. Defaults to 5000.
+        memory_limit_mb (int, optional): The memory limit in megabytes. Defaults to 256.
+
+    Returns:
+        dict: A dictionary containing the result and message of the code execution.
+    """
+
     with tempfile.TemporaryDirectory() as tmpdir:
         # Save code and test files
         with open(os.path.join(tmpdir, "test.py"), "w", encoding="utf-8") as f:
@@ -46,10 +64,10 @@ def run_python_code(
             )
 
             time = threading.Timer(timeout_ms / 1000, kill_process, [proc])
-            time.start()
+            time.start()  # Start timer to kill process if it exceeds timeout
 
             _stdout, stderr = proc.communicate()
-            time.cancel()
+            time.cancel()  # Cancel timer if process completes before timeout
 
             if proc.returncode == 0:
                 return {"result": "success", "message": "Code Executed Successfully"}

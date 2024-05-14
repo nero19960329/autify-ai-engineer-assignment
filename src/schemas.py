@@ -1,3 +1,8 @@
+"""
+This module defines the Pydantic schemas used for request and response validation.
+It includes schemas for creating, updating, and retrieving snippets, as well as schemas for code generation and testing.
+"""
+
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
