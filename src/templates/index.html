@@ -98,6 +98,19 @@
                 regenerationSection.style.display = 'none';
             }
 
+            if (currentSnippetId !== null) {
+                const snippet = snippets.find(s => s.id === currentSnippetId);
+                if (snippet.language !== 'python') {
+                    runTestsBtn.disabled = true;
+                    runTestsBtn.classList.remove('bg-teal-500');
+                    runTestsBtn.classList.add('bg-gray-500', 'cursor-not-allowed');
+                } else {
+                    runTestsBtn.disabled = false;
+                    runTestsBtn.classList.remove('bg-gray-500', 'cursor-not-allowed');
+                    runTestsBtn.classList.add('bg-teal-500');
+                }
+            }
+
             if (testResult === 'failure') {
                 regenerateBtn.disabled = false;
                 regenerateBtn.classList.remove('bg-gray-500');
@@ -225,6 +238,12 @@
             }
         });
 
+        function processCodeString(codeString) {
+            codeString = codeString.replace(/^```.*?\n/, '');
+            codeString = codeString.replace(/\n```$/, '');
+            return codeString;
+        }
+
         async function streamResponse(response, callback) {
             const reader = response.body.getReader();
             let decoder = new TextDecoder();
@@ -259,7 +278,7 @@
             const codeElement = generatedCode.querySelector('code');
             codeElement.textContent = '';
 
-            const [codeResponse, titleResponse] = await Promise.all([
+            const [codeResponse, titleResponse, langPromise] = [
                 fetch('/generate/code', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -274,37 +293,49 @@
                         description: codeDescription.value,
                     }),
                 }),
-            ]);
+                fetch('/generate/detect_language', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        description: codeDescription.value,
+                    }),
+                }).then(response => response.json())
+            ];
 
-            const codeData = await streamResponse(codeResponse, data => {
-                codeElement.textContent += data;
+            const results = await Promise.allSettled([codeResponse, titleResponse, langPromise]);
+
+            const codeResult = results[0];
+            const titleResult = results[1];
+            const langResult = results[2];
+
+            if (codeResult.status === 'fulfilled') {
+                let codeData = await streamResponse(codeResult.value, data => {
+                    codeElement.textContent += data;
+                    highlightCode(codeElement);
+                    updateSectionsVisibility();
+                });
+                codeData = processCodeString(codeData);
+                snippet.code = codeData;
+                codeElement.textContent = codeData;
                 highlightCode(codeElement);
-                updateSectionsVisibility();
-            });
-            snippet.code = codeData;
-
-            const titleData = await streamResponse(titleResponse, data => {
-                snippet.title += data;
-                updateSnippet(snippet);
-            });
-
-            const langResponse = await fetch('/generate/detect_language', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    description: codeDescription.value,
-                    code: codeData,
-                }),
-            });
-            const langData = await langResponse.json();
-            if (langData.language !== snippet.language) {
-                snippet.language = langData.language || '';
-                await updateSnippet(snippet);
             }
-            if (langData.language) {
-                codeElement.className = langData.language;
+
+            if (titleResult.status === 'fulfilled') {
+                const titleData = await streamResponse(titleResult.value, data => {
+                    snippet.title += data;
+                });
             }
-            highlightCode(codeElement);
+
+            if (langResult.status === 'fulfilled') {
+                const langData = langResult.value;
+                if (langData.language !== snippet.language) {
+                    snippet.language = langData.language || '';
+                }
+                if (langData.language) {
+                    codeElement.className = langData.language;
+                }
+                highlightCode(codeElement);
+            }
 
             await updateSnippet(snippet);
         }
@@ -324,16 +355,20 @@
                 body: JSON.stringify({
                     description: codeDescription.value,
                     code: snippet.code,
+                    language: snippet.language,
                     feedback: codeFeedback.value,
                 }),
             });
 
-            const codeData = await streamResponse(response, data => {
+            let codeData = await streamResponse(response, data => {
                 codeElement.textContent += data;
                 highlightCode(codeElement);
             });
 
+            codeData = processCodeString(codeData);
             snippet.code = codeData;
+            codeElement.textContent = codeData;
+            highlightCode(codeElement);
             await updateSnippet(snippet);
         }
 
@@ -351,17 +386,21 @@
                 body: JSON.stringify({
                     description: codeDescription.value,
                     code: snippet.code,
+                    language: snippet.language,
                     feedback: codeFeedback.value,
                 }),
             });
             
-            const testsData = await streamResponse(response, data => {
+            let testsData = await streamResponse(response, data => {
                 testsElement.textContent += data;
                 highlightCode(testsElement);
                 updateSectionsVisibility();
             });
 
+            testsData = processCodeString(testsData);
             snippet.test_code = testsData;
+            testsElement.textContent = testsData;
+            highlightCode(testsElement);
             await updateSnippet(snippet);
         }
 
@@ -380,32 +419,38 @@
                 body: JSON.stringify({
                     description: codeDescription.value,
                     code: snippet.code,
+                    language: snippet.language,
                     feedback: codeFeedback.value,
                     test_code: snippet.test_code,
                     test_feedback: testsFeedback.value,
                 }),
             });
 
-            const testsData = await streamResponse(response, data => {
+            let testsData = await streamResponse(response, data => {
                 testsElement.textContent += data;
                 highlightCode(testsElement);
             });
 
+            testsData = processCodeString(testsData);
             snippet.test_code = testsData;
+            testsElement.textContent = testsData;
+            highlightCode(testsElement);
             await updateSnippet(snippet);
         }
 
         improveTestsBtn.addEventListener('click', improveTests);
 
         async function runTests() {
+            const snippet = snippets.find(s => s.id === currentSnippetId);
+
             const response = await fetch('/run_tests', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     snippet_id: currentSnippetId,
-                    code: generatedCode.querySelector('code').textContent,
-                    test_code: generatedTests.querySelector('code').textContent,
-                    language: 'python',
+                    code: snippet.code,
+                    language: snippet.language,
+                    test_code: snippet.test_code,
                 }),
             });
             const data = await response.json();
@@ -431,6 +476,7 @@
                 body: JSON.stringify({
                     description: codeDescription.value,
                     code: snippet.code,
+                    language: snippet.language,
                     feedback: codeFeedback.value,
                     test_code: generatedTests.querySelector('code').textContent,
                     test_feedback: testsFeedback.value,
@@ -438,12 +484,15 @@
                 }),
             });
 
-            const codeData = await streamResponse(response, data => {
+            let codeData = await streamResponse(response, data => {
                 codeElement.textContent += data;
                 highlightCode(codeElement);
             });
 
+            codeData = processCodeString(codeData);
             snippet.code = codeData;
+            codeElement.textContent = codeData;
+            highlightCode(codeElement);
             await updateSnippet(snippet);
         }
 

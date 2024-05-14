@@ -41,7 +41,7 @@ def test_get_snippet(client):
 def test_update_snippet(client):
     post_response = client.post(
         "/snippets",
-        json={"title": "Initial Title", "language": "Python", "code": "print('hello')"},
+        json={"title": "Initial Title", "language": "python", "code": "print('hello')"},
     )
     snippet_id = post_response.json()["id"]
     assert post_response.status_code == 200
@@ -66,7 +66,7 @@ def test_delete_snippet(client):
         "/snippets",
         json={
             "title": "Delete Test",
-            "language": "Python",
+            "language": "python",
             "code": "print('delete me')",
         },
     )
