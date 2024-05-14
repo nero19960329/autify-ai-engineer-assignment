@@ -208,7 +208,7 @@ describe("Code Generation Functionality", () => {
       cy.visit("/");
       cy.get(`a[data-id="${snippetId}"]`).click();
 
-      cy.intercept("POST", "/run_tests").as("runTests");
+      cy.intercept("POST", "/run/python").as("runTests");
 
       cy.get("#run-tests-btn").click();
 
