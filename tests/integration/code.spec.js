@@ -245,4 +245,88 @@ describe("Code Generation Functionality", () => {
       cy.get("#run-tests-btn").should("be.disabled");
     });
   });
+
+  it("should handle code generation failure gracefully", () => {
+    cy.get("#create-snippet-btn").click();
+    cy.get("#code-description").type(
+      "Write a Python function to add two numbers.",
+    );
+
+    cy.intercept("POST", "/api/generate/code", {
+      statusCode: 500,
+      body: { detail: "OpenAI API error" },
+    }).as("generateCode");
+
+    cy.get("#generate-code-btn").click();
+
+    cy.wait("@generateCode").its("response.statusCode").should("eq", 500);
+    cy.get("#generated-code").should("contain.text", "OpenAI API error");
+  });
+
+  it("should handle test generation failure gracefully", () => {
+    cy.request("POST", "/api/snippets", {
+      title: "Addition Function",
+      language: "python",
+      description: "Write a Python function to add two numbers.",
+      code: "def add(a, b): return a + b",
+    }).then((response) => {
+      const snippetId = response.body.id;
+      cy.visit("/");
+      cy.get(`a[data-id="${snippetId}"]`).click();
+
+      cy.intercept("POST", "/api/generate/tests", {
+        statusCode: 500,
+        body: { detail: "OpenAI API error" },
+      }).as("generateTests");
+
+      cy.get("#generate-tests-btn").click();
+
+      cy.wait("@generateTests").its("response.statusCode").should("eq", 500);
+      cy.get("#generated-tests").should("contain.text", "OpenAI API error");
+    });
+  });
+
+  it("should handle OpenAI API rate limit errors", () => {
+    cy.get("#create-snippet-btn").click();
+    cy.get("#code-description").type(
+      "Write a Python function to add two numbers.",
+    );
+
+    cy.intercept("POST", "/api/generate/code", {
+      statusCode: 429,
+      body: { detail: "Rate limit exceeded" },
+    }).as("generateCode");
+
+    cy.get("#generate-code-btn").click();
+
+    cy.wait("@generateCode").its("response.statusCode").should("eq", 429);
+    cy.get("#generated-code").should("contain.text", "Rate limit exceeded");
+  });
+
+  it("should handle code improvement failure gracefully", () => {
+    cy.request("POST", "/api/snippets", {
+      title: "Addition Function",
+      language: "python",
+      description: "Write a Python function to add two numbers.",
+      code: "def add(a, b): return a + b",
+    }).then((response) => {
+      const snippetId = response.body.id;
+      cy.visit("/");
+      cy.get(`a[data-id="${snippetId}"]`).click();
+
+      cy.get("#code-feedback").type(
+        "Add type hints to the function parameters and return type.",
+      );
+
+      cy.intercept("POST", "/api/generate/code_from_feedback", {
+        statusCode: 500,
+        body: { detail: "OpenAI API error" },
+      }).as("improveCode");
+
+      cy.get("#improve-code-btn").click();
+
+      cy.wait("@improveCode").its("response.statusCode").should("eq", 500);
+      cy.get("#generated-code").should("contain.text", "OpenAI API error");
+    });
+  });
 });
