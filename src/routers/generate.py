@@ -6,7 +6,7 @@ It also includes endpoints for detecting languages and improving code and tests 
 import json
 import os
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 import openai
 
@@ -16,8 +16,13 @@ router = APIRouter(prefix="/generate", tags=["generate"])
 
 
 def load_system_prompt(filename):
-    with open(os.path.join("src", "prompts", filename), "r", encoding="utf-8") as f:
-        return f.read().strip()
+    try:
+        with open(os.path.join("src", "prompts", filename), "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except FileNotFoundError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Prompt file {filename} not found"
+        ) from e
 
 
 async def chatgpt_stream_response(messages: list):
@@ -30,22 +35,25 @@ async def chatgpt_stream_response(messages: list):
     Yields:
         str: The content of each chunk in the stream response.
     """
+    try:
+        client = openai.AsyncOpenAI()
+        if os.getenv("OPENAI_API_BASE"):
+            client.base_url = os.getenv("OPENAI_API_BASE")  # Set custom API base URL
 
-    client = openai.AsyncOpenAI()
-    if os.getenv("OPENAI_API_BASE"):
-        client.base_url = os.getenv("OPENAI_API_BASE")  # Set custom API base URL
+        stream = await client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            stream=True,
+        )
 
-    stream = await client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        stream=True,
-    )
+        async for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                yield chunk.choices[
+                    0
+                ].delta.content  # Yield content of each chunk in the stream
 
-    async for chunk in stream:
-        if chunk.choices[0].delta.content is not None:
-            yield chunk.choices[
-                0
-            ].delta.content  # Yield content of each chunk in the stream
+    except openai.APIConnectionError as e:
+        raise HTTPException(status_code=500, detail=f"OpenAI API error: {e}") from e
 
 
 async def chatgpt_response(messages: list, response_format: dict | None = None):
@@ -59,18 +67,21 @@ async def chatgpt_response(messages: list, response_format: dict | None = None):
     Returns:
         str: The content of the response from the ChatGPT API.
     """
+    try:
+        client = openai.OpenAI()
+        if os.getenv("OPENAI_API_BASE"):
+            client.base_url = os.getenv("OPENAI_API_BASE")
 
-    client = openai.OpenAI()
-    if os.getenv("OPENAI_API_BASE"):
-        client.base_url = os.getenv("OPENAI_API_BASE")
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            response_format=response_format or {},
+            messages=messages,
+        )
 
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        response_format=response_format or {},
-        messages=messages,
-    )
+        return response.choices[0].message.content
 
-    return response.choices[0].message.content
+    except openai.APIConnectionError as e:
+        raise HTTPException(status_code=500, detail=f"OpenAI API error: {e}") from e
 
 
 @router.post("/title")
