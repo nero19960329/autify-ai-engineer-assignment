@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developer Guide &mdash; Code Snippet Generator  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+    <link rel="canonical" href="https://nero19960329.github.io/autify-ai-engineer-assignment/developer_guide.html" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script>mermaid.initialize({"startOnLoad": true})</script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Documentation" href="api.html" />
+    <link rel="prev" title="Usage Instructions" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Code Snippet Generator
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system_design.html">System Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Instructions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Code Snippet Generator</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Developer Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/developer_guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="developer-guide">
+<h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading"></a></h1>
+<p>This section provides useful instructions for developers working on the Autify AI Engineer Assignment project.</p>
+<ol class="arabic">
+<li><dl>
+<dt><strong>Setting Up Development Environment</strong>:</dt><dd><ul>
+<li><p>Clone the repository and create a new Python environment.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/nero19960329/autify-ai-engineer-assignment.git</span>
+<span class="pre">cd</span> <span class="pre">autify-ai-engineer-assignment</span>
+<span class="pre">python</span> <span class="pre">-m</span> <span class="pre">venv</span> <span class="pre">env</span>
+<span class="pre">source</span> <span class="pre">env/bin/activate</span>
+<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span> <span class="pre">-r</span> <span class="pre">requirements-dev.txt</span>
+<span class="pre">`</span></code></p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt><strong>Running Tests</strong>:</dt><dd><ul>
+<li><p>Use <cite>pytest</cite> to run unit tests.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">ENV=test</span> <span class="pre">pytest</span> <span class="pre">tests/unit</span>
+<span class="pre">`</span></code></p>
+</li>
+<li><p>Use Cypress to run integration tests.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">cd</span> <span class="pre">tests/integration</span>
+<span class="pre">yarn</span>
+<span class="pre">yarn</span> <span class="pre">test</span>
+<span class="pre">`</span></code></p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>GitHub Actions</strong>:</dt><dd><ul class="simple">
+<li><p>This project uses GitHub Actions for Continuous Integration (CI).</p></li>
+<li><p>There are three workflows configured: <cite>integration.yml</cite>, <cite>module.yml</cite>, and <cite>repo.yml</cite>.</p></li>
+<li><p><strong>Integration Workflow</strong>:
+- Triggered on push and pull request events to the main branch.
+- Sets up the environment, starts services, and runs integration tests using Cypress.
+- Results are uploaded as artifacts.</p></li>
+<li><p><strong>Module Workflow</strong>:
+- Triggered on push and pull request events to the main branch.
+- Sets up the environment, checks code formatting, and runs unit tests using pytest.</p></li>
+<li><p><strong>Repo Workflow</strong>:
+- Triggered on pull request events to the main branch.
+- Runs commitlint to ensure commit messages follow the conventional commit standard.</p></li>
+<li><p><strong>Viewing Results</strong>:
+- You can view the results of the workflows by navigating to the “Actions” tab of the GitHub repository.
+- Each workflow run will show detailed logs and the status of each step.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt><strong>Building and Running Docker Containers</strong>:</dt><dd><ul>
+<li><p>Build the Docker image.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">docker</span> <span class="pre">build</span> <span class="pre">-t</span> <span class="pre">code-snippet-app</span> <span class="pre">.</span>
+<span class="pre">`</span></code></p>
+</li>
+<li><p>Run the Docker container.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">docker</span> <span class="pre">run</span> <span class="pre">--rm</span> <span class="pre">-p</span> <span class="pre">8000:8000</span> <span class="pre">--env-file</span> <span class="pre">.env</span> <span class="pre">code-snippet-app</span>
+<span class="pre">`</span></code></p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Adding New Features</strong>:</dt><dd><ul class="simple">
+<li><p>Follow the existing project structure and coding conventions.</p></li>
+<li><p>Document new features and endpoints in the appropriate <cite>.rst</cite> files.</p></li>
+<li><p>Update tests to cover new features.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Deployment</strong>:</dt><dd><ul class="simple">
+<li><p>Ensure all changes are committed and pushed to the repository.</p></li>
+<li><p>Use CI/CD pipelines to automate the build and deployment process.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<p>By following these guidelines, you can effectively develop and maintain this project.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage Instructions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Zhao Wang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
