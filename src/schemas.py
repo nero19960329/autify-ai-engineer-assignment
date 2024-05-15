@@ -16,6 +16,7 @@ class SnippetCreate(BaseModel):
     feedback: str = ""
     test_code: str = ""
     test_feedback: str = ""
+    is_active: bool = True
 
 
 class SnippetUpdate(BaseModel):
