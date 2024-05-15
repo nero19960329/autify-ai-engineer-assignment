@@ -21,7 +21,7 @@ This section provides useful instructions for developers working on this project
 
           ENV=test pytest tests/unit
 
-    - Use Cypress to run integration tests.
+    - Use Cypress to run integration tests.  Make sure the application is running before running the tests.
 
       .. code-block:: bash
 
