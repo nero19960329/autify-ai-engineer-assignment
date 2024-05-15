@@ -6,5 +6,8 @@ module.exports = defineConfig({
     specPattern: "*.spec.js",
     supportFile: false,
     video: true,
+    env: {
+      encoding: "utf-8",
+    },
   },
 });
