@@ -8,8 +8,8 @@ This section provides useful instructions for developers working on this project
 
       .. code-block:: bash
 
-          git clone https://github.com/nero19960329/autify-ai-engineer-assignment.git
-          cd autify-ai-engineer-assignment
+          git clone https://github.com/nero19960329/code-snippet-generator.git
+          cd code-snippet-generator
           python -m venv env
           source env/bin/activate
           pip install -r requirements.txt -r requirements-dev.txt
