@@ -1,5 +1,7 @@
 # Autify AI Engineer Assignment: Code Snippet Generation
 
+For detailed documentation on this project, please visit [https://nero19960329.github.io/autify-ai-engineer-assignment/](https://nero19960329.github.io/autify-ai-engineer-assignment/).
+
 This assignment evaluates your ability to write clean Python code and solve AI/LLM problems. Your main task is to implement the APIs necessary for generating code snippets.
 
 The application should **at least** support the following programming languages:
