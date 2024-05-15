@@ -5,7 +5,7 @@ It includes the Snippet model, which represents a code snippet with associated m
 
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
@@ -24,5 +24,6 @@ class Snippet(Base):
     test_feedback = Column(Text, default="")
     test_result = Column(String, default="")
     test_result_message = Column(Text, default="")
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
