@@ -1,7 +1,7 @@
 Usage Instructions
 ==================
 
-This section provides detailed instructions on how to use the various features of the Autify AI Engineer Assignment project.
+This section provides detailed instructions on how to use the various features of this project.
 
 1. **Creating Snippets**:
     - Click the "Create New Snippet" button.

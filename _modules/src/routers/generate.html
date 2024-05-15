@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.routers.generate &mdash; Code Snippet Generator  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+    <link rel="canonical" href="https://nero19960329.github.io/autify-ai-engineer-assignment/_modules/src/routers/generate.html" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script>mermaid.initialize({"startOnLoad": true})</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Code Snippet Generator
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../system_design.html">System Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Code Snippet Generator</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.routers.generate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.routers.generate</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines the endpoints for generating code snippets, titles, and tests.</span>
+<span class="sd">It also includes endpoints for detecting languages and improving code and tests based on feedback.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span> <span class="nn">fastapi.responses</span> <span class="kn">import</span> <span class="n">StreamingResponse</span>
+<span class="kn">import</span> <span class="nn">openai</span>
+
+<span class="kn">from</span> <span class="nn">src</span> <span class="kn">import</span> <span class="n">schemas</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;/generate&quot;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;generate&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="load_system_prompt">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.load_system_prompt">[docs]</a>
+<span class="k">def</span> <span class="nf">load_system_prompt</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads a system prompt from a file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): The name of the file to load the prompt from.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The content of the prompt file.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If the prompt file is not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">,</span> <span class="s2">&quot;prompts&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Prompt file </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> not found&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+
+<div class="viewcode-block" id="chatgpt_stream_response">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.chatgpt_stream_response">[docs]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">chatgpt_stream_response</span><span class="p">(</span><span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Send messages to the ChatGPT API and stream the response.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        messages (list): The list of messages to send to the ChatGPT API.</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        str: The content of each chunk in the stream response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">AsyncOpenAI</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">):</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">)</span>  <span class="c1"># Set custom API base URL</span>
+
+        <span class="n">stream</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">chunk</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">chunk</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span>
+                    <span class="mi">0</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">content</span>  <span class="c1"># Yield content of each chunk in the stream</span>
+
+    <span class="k">except</span> <span class="n">openai</span><span class="o">.</span><span class="n">APIConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;OpenAI API error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+
+<div class="viewcode-block" id="chatgpt_response">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.chatgpt_response">[docs]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">chatgpt_response</span><span class="p">(</span><span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">response_format</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Send messages to the ChatGPT API and return the complete response.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        messages (list): The list of messages to send to the ChatGPT API.</span>
+<span class="sd">        response_format (dict, optional): The format of the response. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The content of the response from the ChatGPT API.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">OpenAI</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">):</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>
+            <span class="n">response_format</span><span class="o">=</span><span class="n">response_format</span> <span class="ow">or</span> <span class="p">{},</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+
+    <span class="k">except</span> <span class="n">openai</span><span class="o">.</span><span class="n">APIConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;OpenAI API error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+
+<div class="viewcode-block" id="generate_title">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.generate_title">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/title&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_title</span><span class="p">(</span><span class="n">title_gen_data</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">TitleGenRequest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a title for the given code description.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        title_gen_data (schemas.TitleGenRequest): The request data containing the code description.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        StreamingResponse: The generated title as a streaming response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">load_system_prompt</span><span class="p">(</span><span class="s2">&quot;generate_title.txt&quot;</span><span class="p">)},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">title_gen_data</span><span class="o">.</span><span class="n">description</span><span class="p">}),</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">chatgpt_stream_response</span><span class="p">(</span><span class="n">messages</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/event-stream&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_code">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.generate_code">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/code&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_code</span><span class="p">(</span><span class="n">code_gen_data</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">CodeGenRequest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates code for the given code description.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        code_gen_data (schemas.CodeGenRequest): The request data containing the code description.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        StreamingResponse: The generated code as a streaming response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">load_system_prompt</span><span class="p">(</span><span class="s2">&quot;generate_code.txt&quot;</span><span class="p">)},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">code_gen_data</span><span class="o">.</span><span class="n">description</span><span class="p">}),</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">chatgpt_stream_response</span><span class="p">(</span><span class="n">messages</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/event-stream&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="detect_language">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.detect_language">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/detect_language&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">schemas</span><span class="o">.</span><span class="n">LanguageDetResponse</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">detect_language</span><span class="p">(</span><span class="n">language_gen_data</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">LanguageDetRequest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Detects the programming language for the given code description.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        language_gen_data (schemas.LanguageDetRequest): The request data containing the code description.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        schemas.LanguageDetResponse: The detected programming language.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">load_system_prompt</span><span class="p">(</span><span class="s2">&quot;detect_language.txt&quot;</span><span class="p">)},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">language_gen_data</span><span class="o">.</span><span class="n">description</span><span class="p">}),</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">chatgpt_response</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">response_format</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;json_object&quot;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_code_from_feedback">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.generate_code_from_feedback">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/code_from_feedback&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_code_from_feedback</span><span class="p">(</span><span class="n">feedback_data</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">CodeFeedbackRequest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates improved code based on feedback.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        feedback_data (schemas.CodeFeedbackRequest): The request data containing the code, feedback, and description.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        StreamingResponse: The improved code as a streaming response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">load_system_prompt</span><span class="p">(</span><span class="s2">&quot;generate_code_from_feedback.txt&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                    <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                    <span class="s2">&quot;feedback&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">feedback</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">chatgpt_stream_response</span><span class="p">(</span><span class="n">messages</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/event-stream&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_tests">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.generate_tests">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/tests&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_tests</span><span class="p">(</span><span class="n">test_gen_data</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">TestGenRequest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates tests for the given code description.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        test_gen_data (schemas.TestGenRequest): The request data containing the code, feedback, and description.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        StreamingResponse: The generated tests as a streaming response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">load_system_prompt</span><span class="p">(</span><span class="s2">&quot;generate_tests.txt&quot;</span><span class="p">)},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">test_gen_data</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="n">test_gen_data</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                    <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">test_gen_data</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                    <span class="s2">&quot;feedback&quot;</span><span class="p">:</span> <span class="n">test_gen_data</span><span class="o">.</span><span class="n">feedback</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">chatgpt_stream_response</span><span class="p">(</span><span class="n">messages</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/event-stream&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_tests_from_feedback">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.generate_tests_from_feedback">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/tests_from_feedback&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_tests_from_feedback</span><span class="p">(</span><span class="n">feedback_data</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">TestsFeedbackRequest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates improved tests based on feedback.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        feedback_data (schemas.TestsFeedbackRequest): The request data containing the code, feedback, test code, and description.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        StreamingResponse: The improved tests as a streaming response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">load_system_prompt</span><span class="p">(</span><span class="s2">&quot;generate_tests_from_feedback.txt&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                    <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                    <span class="s2">&quot;feedback&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">feedback</span><span class="p">,</span>
+                    <span class="s2">&quot;test_code&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">test_code</span><span class="p">,</span>
+                    <span class="s2">&quot;test_feedback&quot;</span><span class="p">:</span> <span class="n">feedback_data</span><span class="o">.</span><span class="n">test_feedback</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">chatgpt_stream_response</span><span class="p">(</span><span class="n">messages</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/event-stream&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="regenerate_code">
+<a class="viewcode-back" href="../../../api.html#src.routers.generate.regenerate_code">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/regenerate&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">regenerate_code</span><span class="p">(</span><span class="n">regenerate_data</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">RegenerateRequest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Regenerates code based on test results.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        regenerate_data (schemas.RegenerateRequest): The request data containing the code, feedback, test code, error message, and description.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        StreamingResponse: The regenerated code as a streaming response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">load_system_prompt</span><span class="p">(</span><span class="s2">&quot;regenerate.txt&quot;</span><span class="p">)},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">regenerate_data</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="n">regenerate_data</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                    <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">regenerate_data</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                    <span class="s2">&quot;feedback&quot;</span><span class="p">:</span> <span class="n">regenerate_data</span><span class="o">.</span><span class="n">feedback</span><span class="p">,</span>
+                    <span class="s2">&quot;test_code&quot;</span><span class="p">:</span> <span class="n">regenerate_data</span><span class="o">.</span><span class="n">test_code</span><span class="p">,</span>
+                    <span class="s2">&quot;test_feedback&quot;</span><span class="p">:</span> <span class="n">regenerate_data</span><span class="o">.</span><span class="n">test_feedback</span><span class="p">,</span>
+                    <span class="s2">&quot;error_message&quot;</span><span class="p">:</span> <span class="n">regenerate_data</span><span class="o">.</span><span class="n">error_message</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">chatgpt_stream_response</span><span class="p">(</span><span class="n">messages</span><span class="p">),</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/event-stream&quot;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Zhao Wang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

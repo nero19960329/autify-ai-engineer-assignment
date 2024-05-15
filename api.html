@@ -53,7 +53,25 @@
 <li class="toctree-l1"><a class="reference internal" href="system_design.html">System Design</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.chatgpt_response"><code class="docutils literal notranslate"><span class="pre">chatgpt_response()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.chatgpt_stream_response"><code class="docutils literal notranslate"><span class="pre">chatgpt_stream_response()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.detect_language"><code class="docutils literal notranslate"><span class="pre">detect_language()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.generate_code"><code class="docutils literal notranslate"><span class="pre">generate_code()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.generate_code_from_feedback"><code class="docutils literal notranslate"><span class="pre">generate_code_from_feedback()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.generate_tests"><code class="docutils literal notranslate"><span class="pre">generate_tests()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.generate_tests_from_feedback"><code class="docutils literal notranslate"><span class="pre">generate_tests_from_feedback()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.generate_title"><code class="docutils literal notranslate"><span class="pre">generate_title()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.load_system_prompt"><code class="docutils literal notranslate"><span class="pre">load_system_prompt()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.generate.regenerate_code"><code class="docutils literal notranslate"><span class="pre">regenerate_code()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.run.run_python"><code class="docutils literal notranslate"><span class="pre">run_python()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.snippets.create_snippet"><code class="docutils literal notranslate"><span class="pre">create_snippet()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.snippets.delete_snippet"><code class="docutils literal notranslate"><span class="pre">delete_snippet()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.snippets.get_snippet"><code class="docutils literal notranslate"><span class="pre">get_snippet()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.snippets.get_snippets"><code class="docutils literal notranslate"><span class="pre">get_snippets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src.routers.snippets.update_snippet"><code class="docutils literal notranslate"><span class="pre">update_snippet()</span></code></a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -80,8 +98,311 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="api-documentation">
-<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Link to this heading"></a></h1>
+  <section id="module-src.routers.generate">
+<span id="api-documentation"></span><h1>API Documentation<a class="headerlink" href="#module-src.routers.generate" title="Link to this heading"></a></h1>
+<p>This module defines the endpoints for generating code snippets, titles, and tests.
+It also includes endpoints for detecting languages and improving code and tests based on feedback.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.chatgpt_response">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">chatgpt_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#chatgpt_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.chatgpt_response" title="Link to this definition"></a></dt>
+<dd><p>Send messages to the ChatGPT API and return the complete response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>list</em>) – The list of messages to send to the ChatGPT API.</p></li>
+<li><p><strong>response_format</strong> (<em>dict</em><em>, </em><em>optional</em>) – The format of the response. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The content of the response from the ChatGPT API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.chatgpt_stream_response">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">chatgpt_stream_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#chatgpt_stream_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.chatgpt_stream_response" title="Link to this definition"></a></dt>
+<dd><p>Send messages to the ChatGPT API and stream the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>messages</strong> (<em>list</em>) – The list of messages to send to the ChatGPT API.</p>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>str</em> – The content of each chunk in the stream response.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.detect_language">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">detect_language</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language_gen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LanguageDetRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#detect_language"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.detect_language" title="Link to this definition"></a></dt>
+<dd><p>Detects the programming language for the given code description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>language_gen_data</strong> (<em>schemas.LanguageDetRequest</em>) – The request data containing the code description.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The detected programming language.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>schemas.LanguageDetResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.generate_code">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">generate_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code_gen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CodeGenRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#generate_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.generate_code" title="Link to this definition"></a></dt>
+<dd><p>Generates code for the given code description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>code_gen_data</strong> (<em>schemas.CodeGenRequest</em>) – The request data containing the code description.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated code as a streaming response.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>StreamingResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.generate_code_from_feedback">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">generate_code_from_feedback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feedback_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CodeFeedbackRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#generate_code_from_feedback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.generate_code_from_feedback" title="Link to this definition"></a></dt>
+<dd><p>Generates improved code based on feedback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>feedback_data</strong> (<em>schemas.CodeFeedbackRequest</em>) – The request data containing the code, feedback, and description.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The improved code as a streaming response.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>StreamingResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.generate_tests">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">generate_tests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_gen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TestGenRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#generate_tests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.generate_tests" title="Link to this definition"></a></dt>
+<dd><p>Generates tests for the given code description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>test_gen_data</strong> (<em>schemas.TestGenRequest</em>) – The request data containing the code, feedback, and description.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated tests as a streaming response.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>StreamingResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.generate_tests_from_feedback">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">generate_tests_from_feedback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feedback_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TestsFeedbackRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#generate_tests_from_feedback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.generate_tests_from_feedback" title="Link to this definition"></a></dt>
+<dd><p>Generates improved tests based on feedback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>feedback_data</strong> (<em>schemas.TestsFeedbackRequest</em>) – The request data containing the code, feedback, test code, and description.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The improved tests as a streaming response.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>StreamingResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.generate_title">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">generate_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title_gen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TitleGenRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#generate_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.generate_title" title="Link to this definition"></a></dt>
+<dd><p>Generates a title for the given code description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title_gen_data</strong> (<em>schemas.TitleGenRequest</em>) – The request data containing the code description.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated title as a streaming response.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>StreamingResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.load_system_prompt">
+<span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">load_system_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#load_system_prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.load_system_prompt" title="Link to this definition"></a></dt>
+<dd><p>Loads a system prompt from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The name of the file to load the prompt from.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The content of the prompt file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>HTTPException</strong> – If the prompt file is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.generate.regenerate_code">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.generate.</span></span><span class="sig-name descname"><span class="pre">regenerate_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regenerate_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RegenerateRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/generate.html#regenerate_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.generate.regenerate_code" title="Link to this definition"></a></dt>
+<dd><p>Regenerates code based on test results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>regenerate_data</strong> (<em>schemas.RegenerateRequest</em>) – The request data containing the code, feedback, test code, error message, and description.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The regenerated code as a streaming response.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>StreamingResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-src.routers.run">This module defines the endpoint for running Python code snippets and their associated tests.
+It validates the input data and returns the test results.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.run.run_python">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.run.</span></span><span class="sig-name descname"><span class="pre">run_python</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_run_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TestRunRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Session</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/run.html#run_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.run.run_python" title="Link to this definition"></a></dt>
+<dd><p>Runs Python code and tests, returning the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_run_data</strong> (<em>schemas.TestRunRequest</em>) – The request data containing the code, test code, and snippet ID.</p></li>
+<li><p><strong>db</strong> (<em>Session</em>) – The database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result and message of the code execution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>HTTPException</strong> – If the snippet is not found or an error occurs during code execution.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-src.routers.snippets">This module defines the endpoints for CRUD operations on code snippets.
+It includes endpoints for creating, retrieving, updating, and deleting snippets.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.snippets.create_snippet">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.snippets.</span></span><span class="sig-name descname"><span class="pre">create_snippet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snippet_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SnippetCreate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Session</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/snippets.html#create_snippet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.snippets.create_snippet" title="Link to this definition"></a></dt>
+<dd><p>Creates a new snippet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snippet_data</strong> (<em>schemas.SnippetCreate</em>) – The data for the new snippet.</p></li>
+<li><p><strong>db</strong> (<em>Session</em>) – The database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created snippet.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>schemas.Snippet</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.snippets.delete_snippet">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.snippets.</span></span><span class="sig-name descname"><span class="pre">delete_snippet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snippet_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Session</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/snippets.html#delete_snippet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.snippets.delete_snippet" title="Link to this definition"></a></dt>
+<dd><p>Deletes a snippet by its ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snippet_id</strong> (<em>int</em>) – The ID of the snippet to delete.</p></li>
+<li><p><strong>db</strong> (<em>Session</em>) – The database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>HTTPException</strong> – If the snippet is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.snippets.get_snippet">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.snippets.</span></span><span class="sig-name descname"><span class="pre">get_snippet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snippet_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Session</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/snippets.html#get_snippet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.snippets.get_snippet" title="Link to this definition"></a></dt>
+<dd><p>Retrieves a snippet by its ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snippet_id</strong> (<em>int</em>) – The ID of the snippet to retrieve.</p></li>
+<li><p><strong>db</strong> (<em>Session</em>) – The database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The retrieved snippet.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>schemas.Snippet</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>HTTPException</strong> – If the snippet is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.snippets.get_snippets">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.snippets.</span></span><span class="sig-name descname"><span class="pre">get_snippets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Session</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/snippets.html#get_snippets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.snippets.get_snippets" title="Link to this definition"></a></dt>
+<dd><p>Retrieves a list of active snippets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>db</strong> (<em>Session</em>) – The database session.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of active snippets.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[schemas.Snippet]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.routers.snippets.update_snippet">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.routers.snippets.</span></span><span class="sig-name descname"><span class="pre">update_snippet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snippet_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snippet_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SnippetUpdate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Session</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/routers/snippets.html#update_snippet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.routers.snippets.update_snippet" title="Link to this definition"></a></dt>
+<dd><p>Updates a snippet by its ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snippet_id</strong> (<em>int</em>) – The ID of the snippet to update.</p></li>
+<li><p><strong>snippet_data</strong> (<em>schemas.SnippetUpdate</em>) – The updated data for the snippet.</p></li>
+<li><p><strong>db</strong> (<em>Session</em>) – The database session.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated snippet.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>schemas.Snippet</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>HTTPException</strong> – If the snippet is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 

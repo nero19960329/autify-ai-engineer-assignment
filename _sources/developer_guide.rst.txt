@@ -1,33 +1,33 @@
 Developer Guide
 ===============
 
-This section provides useful instructions for developers working on the Autify AI Engineer Assignment project.
+This section provides useful instructions for developers working on this project.
 
 1. **Setting Up Development Environment**:
     - Clone the repository and create a new Python environment.
 
-      ```bash
-      git clone https://github.com/nero19960329/autify-ai-engineer-assignment.git
-      cd autify-ai-engineer-assignment
-      python -m venv env
-      source env/bin/activate
-      pip install -r requirements.txt -r requirements-dev.txt
-      ```
+      .. code-block:: bash
+
+          git clone https://github.com/nero19960329/autify-ai-engineer-assignment.git
+          cd autify-ai-engineer-assignment
+          python -m venv env
+          source env/bin/activate
+          pip install -r requirements.txt -r requirements-dev.txt
 
 2. **Running Tests**:
     - Use `pytest` to run unit tests.
 
-      ```bash
-      ENV=test pytest tests/unit
-      ```
+      .. code-block:: bash
+
+          ENV=test pytest tests/unit
 
     - Use Cypress to run integration tests.
 
-      ```bash
-      cd tests/integration
-      yarn
-      yarn test
-      ```
+      .. code-block:: bash
+
+          cd tests/integration
+          yarn
+          yarn test
 
 3. **GitHub Actions**:
     - This project uses GitHub Actions for Continuous Integration (CI).
@@ -49,15 +49,15 @@ This section provides useful instructions for developers working on the Autify A
 4. **Building and Running Docker Containers**:
     - Build the Docker image.
 
-      ```bash
-      docker build -t code-snippet-app .
-      ```
+      .. code-block:: bash
+
+          docker build -t code-snippet-app .
 
     - Run the Docker container.
 
-      ```bash
-      docker run --rm -p 8000:8000 --env-file .env code-snippet-app
-      ```
+      .. code-block:: bash
+
+          docker run --rm -p 8000:8000 --env-file .env code-snippet-app
 
 5. **Adding New Features**:
     - Follow the existing project structure and coding conventions.

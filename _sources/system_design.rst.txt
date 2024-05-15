@@ -1,7 +1,7 @@
 System Design
 =============
 
-The Autify AI Engineer Assignment project is designed with a microservices architecture, leveraging FastAPI for the backend and Docker for deployment. The key components include:
+This project is designed with a microservices architecture, leveraging FastAPI for the backend and Docker for deployment. The key components include:
 
 1. **Backend Services**:
     - **API Service**: Provides endpoints for generating, improving, and running code snippets.
