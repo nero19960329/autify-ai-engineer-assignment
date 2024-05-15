@@ -9,6 +9,10 @@ from pydantic import BaseModel, ConfigDict
 
 
 class SnippetCreate(BaseModel):
+    """
+    Schema for creating a snippet.
+    """
+
     title: str = ""
     language: str = ""
     description: str = ""
@@ -20,6 +24,10 @@ class SnippetCreate(BaseModel):
 
 
 class SnippetUpdate(BaseModel):
+    """
+    Schema for updating a snippet.
+    """
+
     title: str | None = None
     language: str | None = None
     description: str | None = None
@@ -30,6 +38,10 @@ class SnippetUpdate(BaseModel):
 
 
 class Snippet(SnippetCreate):
+    """
+    Schema for a snippet, including additional fields for ID and timestamps.
+    """
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -40,22 +52,42 @@ class Snippet(SnippetCreate):
 
 
 class LanguageDetRequest(BaseModel):
+    """
+    Schema for a language detection request.
+    """
+
     description: str
 
 
 class LanguageDetResponse(BaseModel):
+    """
+    Schema for a language detection response.
+    """
+
     language: str | None
 
 
 class CodeGenRequest(BaseModel):
+    """
+    Schema for a code generation request.
+    """
+
     description: str
 
 
 class TitleGenRequest(BaseModel):
+    """
+    Schema for a title generation request.
+    """
+
     description: str
 
 
 class CodeFeedbackRequest(BaseModel):
+    """
+    Schema for a code improvement request based on feedback.
+    """
+
     description: str
     code: str
     language: str
@@ -63,6 +95,10 @@ class CodeFeedbackRequest(BaseModel):
 
 
 class TestGenRequest(BaseModel):
+    """
+    Schema for a test generation request.
+    """
+
     description: str
     code: str
     language: str
@@ -70,6 +106,10 @@ class TestGenRequest(BaseModel):
 
 
 class TestsFeedbackRequest(BaseModel):
+    """
+    Schema for a test improvement request based on feedback.
+    """
+
     description: str
     code: str
     language: str
@@ -79,6 +119,10 @@ class TestsFeedbackRequest(BaseModel):
 
 
 class TestRunRequest(BaseModel):
+    """
+    Schema for a test run request.
+    """
+
     snippet_id: int
     code: str
     language: str
@@ -86,6 +130,10 @@ class TestRunRequest(BaseModel):
 
 
 class RegenerateRequest(BaseModel):
+    """
+    Schema for a code regeneration request based on test results.
+    """
+
     description: str
     code: str
     language: str

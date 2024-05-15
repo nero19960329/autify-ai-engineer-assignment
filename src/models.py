@@ -12,6 +12,10 @@ Base = declarative_base()
 
 
 class Snippet(Base):
+    """
+    Represents a code snippet with associated metadata.
+    """
+
     __tablename__ = "snippets"
 
     id = Column(Integer, primary_key=True, index=True)

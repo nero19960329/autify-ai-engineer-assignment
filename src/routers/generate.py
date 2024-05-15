@@ -16,6 +16,18 @@ router = APIRouter(prefix="/generate", tags=["generate"])
 
 
 def load_system_prompt(filename):
+    """
+    Loads a system prompt from a file.
+
+    Args:
+        filename (str): The name of the file to load the prompt from.
+
+    Returns:
+        str: The content of the prompt file.
+
+    Raises:
+        HTTPException: If the prompt file is not found.
+    """
     try:
         with open(os.path.join("src", "prompts", filename), "r", encoding="utf-8") as f:
             return f.read().strip()
@@ -86,6 +98,15 @@ async def chatgpt_response(messages: list, response_format: dict | None = None):
 
 @router.post("/title")
 async def generate_title(title_gen_data: schemas.TitleGenRequest):
+    """
+    Generates a title for the given code description.
+
+    Args:
+        title_gen_data (schemas.TitleGenRequest): The request data containing the code description.
+
+    Returns:
+        StreamingResponse: The generated title as a streaming response.
+    """
     messages = [
         {"role": "system", "content": load_system_prompt("generate_title.txt")},
         {
@@ -101,6 +122,15 @@ async def generate_title(title_gen_data: schemas.TitleGenRequest):
 
 @router.post("/code")
 async def generate_code(code_gen_data: schemas.CodeGenRequest):
+    """
+    Generates code for the given code description.
+
+    Args:
+        code_gen_data (schemas.CodeGenRequest): The request data containing the code description.
+
+    Returns:
+        StreamingResponse: The generated code as a streaming response.
+    """
     messages = [
         {"role": "system", "content": load_system_prompt("generate_code.txt")},
         {
@@ -116,6 +146,15 @@ async def generate_code(code_gen_data: schemas.CodeGenRequest):
 
 @router.post("/detect_language", response_model=schemas.LanguageDetResponse)
 async def detect_language(language_gen_data: schemas.LanguageDetRequest):
+    """
+    Detects the programming language for the given code description.
+
+    Args:
+        language_gen_data (schemas.LanguageDetRequest): The request data containing the code description.
+
+    Returns:
+        schemas.LanguageDetResponse: The detected programming language.
+    """
     messages = [
         {"role": "system", "content": load_system_prompt("detect_language.txt")},
         {
@@ -130,6 +169,15 @@ async def detect_language(language_gen_data: schemas.LanguageDetRequest):
 
 @router.post("/code_from_feedback")
 async def generate_code_from_feedback(feedback_data: schemas.CodeFeedbackRequest):
+    """
+    Generates improved code based on feedback.
+
+    Args:
+        feedback_data (schemas.CodeFeedbackRequest): The request data containing the code, feedback, and description.
+
+    Returns:
+        StreamingResponse: The improved code as a streaming response.
+    """
     messages = [
         {
             "role": "system",
@@ -155,6 +203,15 @@ async def generate_code_from_feedback(feedback_data: schemas.CodeFeedbackRequest
 
 @router.post("/tests")
 async def generate_tests(test_gen_data: schemas.TestGenRequest):
+    """
+    Generates tests for the given code description.
+
+    Args:
+        test_gen_data (schemas.TestGenRequest): The request data containing the code, feedback, and description.
+
+    Returns:
+        StreamingResponse: The generated tests as a streaming response.
+    """
     messages = [
         {"role": "system", "content": load_system_prompt("generate_tests.txt")},
         {
@@ -177,6 +234,15 @@ async def generate_tests(test_gen_data: schemas.TestGenRequest):
 
 @router.post("/tests_from_feedback")
 async def generate_tests_from_feedback(feedback_data: schemas.TestsFeedbackRequest):
+    """
+    Generates improved tests based on feedback.
+
+    Args:
+        feedback_data (schemas.TestsFeedbackRequest): The request data containing the code, feedback, test code, and description.
+
+    Returns:
+        StreamingResponse: The improved tests as a streaming response.
+    """
     messages = [
         {
             "role": "system",
@@ -204,6 +270,15 @@ async def generate_tests_from_feedback(feedback_data: schemas.TestsFeedbackReque
 
 @router.post("/regenerate")
 async def regenerate_code(regenerate_data: schemas.RegenerateRequest):
+    """
+    Regenerates code based on test results.
+
+    Args:
+        regenerate_data (schemas.RegenerateRequest): The request data containing the code, feedback, test code, error message, and description.
+
+    Returns:
+        StreamingResponse: The regenerated code as a streaming response.
+    """
     messages = [
         {"role": "system", "content": load_system_prompt("regenerate.txt")},
         {

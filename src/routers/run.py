@@ -18,6 +18,19 @@ router = APIRouter(prefix="/run", tags=["run"])
 async def run_python(
     test_run_data: schemas.TestRunRequest, db: Session = Depends(get_db)
 ):
+    """
+    Runs Python code and tests, returning the results.
+
+    Args:
+        test_run_data (schemas.TestRunRequest): The request data containing the code, test code, and snippet ID.
+        db (Session): The database session.
+
+    Returns:
+        dict: The result and message of the code execution.
+
+    Raises:
+        HTTPException: If the snippet is not found or an error occurs during code execution.
+    """
     if test_run_data.language != "python":
         logger.warning(
             f"Unsupported language for running tests: {test_run_data.language}"

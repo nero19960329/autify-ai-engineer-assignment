@@ -9,6 +9,16 @@ from src import models, schemas
 
 
 def create_snippet(db: Session, snippet_data: schemas.SnippetCreate) -> models.Snippet:
+    """
+    Creates a new snippet in the database.
+
+    Args:
+        db (Session): The database session.
+        snippet_data (schemas.SnippetCreate): The snippet data to create.
+
+    Returns:
+        models.Snippet: The created snippet.
+    """
     db_snippet = models.Snippet(**snippet_data.model_dump())
     db.add(db_snippet)
     db.commit()
@@ -17,6 +27,16 @@ def create_snippet(db: Session, snippet_data: schemas.SnippetCreate) -> models.S
 
 
 def get_snippet(db: Session, snippet_id: int) -> models.Snippet:
+    """
+    Retrieves a snippet by its ID.
+
+    Args:
+        db (Session): The database session.
+        snippet_id (int): The ID of the snippet to retrieve.
+
+    Returns:
+        models.Snippet: The retrieved snippet, or None if not found.
+    """
     return (
         db.query(models.Snippet)
         .filter(models.Snippet.id == snippet_id)
@@ -26,6 +46,17 @@ def get_snippet(db: Session, snippet_id: int) -> models.Snippet:
 
 
 def get_snippets(db: Session, skip: int = 0, limit: int = 100) -> list[models.Snippet]:
+    """
+    Retrieves a list of active snippets, with optional pagination.
+
+    Args:
+        db (Session): The database session.
+        skip (int, optional): The number of snippets to skip. Defaults to 0.
+        limit (int, optional): The maximum number of snippets to retrieve. Defaults to 100.
+
+    Returns:
+        list[models.Snippet]: The list of retrieved snippets.
+    """
     return (
         db.query(models.Snippet)
         .filter(models.Snippet.is_active == True)
@@ -39,6 +70,17 @@ def get_snippets(db: Session, skip: int = 0, limit: int = 100) -> list[models.Sn
 def update_snippet(
     db: Session, snippet_id: int, snippet_data: schemas.SnippetUpdate
 ) -> models.Snippet:
+    """
+    Updates an existing snippet in the database.
+
+    Args:
+        db (Session): The database session.
+        snippet_id (int): The ID of the snippet to update.
+        snippet_data (schemas.SnippetUpdate): The updated snippet data.
+
+    Returns:
+        models.Snippet: The updated snippet, or None if not found.
+    """
     db_snippet = get_snippet(db, snippet_id)
     if not db_snippet:
         return None
@@ -51,6 +93,16 @@ def update_snippet(
 
 
 def delete_snippet(db: Session, snippet_id: int) -> bool:
+    """
+    Marks a snippet as inactive (soft delete).
+
+    Args:
+        db (Session): The database session.
+        snippet_id (int): The ID of the snippet to delete.
+
+    Returns:
+        bool: True if the snippet was deleted, False otherwise.
+    """
     db_snippet = get_snippet(db, snippet_id)
     if db_snippet:
         db_snippet.is_active = False

@@ -17,6 +17,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db():
+    """
+    Generates a database session for dependency injection.
+
+    Yields:
+        Session: The database session.
+    """
     db = SessionLocal()
     try:
         yield db

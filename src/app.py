@@ -29,6 +29,10 @@ templates = Jinja2Templates(directory="src/templates")
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
+    """
+    Handles generic exceptions and logs them.
+    Returns a 500 Internal Server Error response.
+    """
     logger.exception(f"Unhandled exception: {exc}")
     return JSONResponse(
         status_code=500,
@@ -38,6 +42,10 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Handles validation exceptions and logs them.
+    Returns a 422 Unprocessable Entity response.
+    """
     logger.error(f"Validation error: {exc}")
     return JSONResponse(
         status_code=422,
@@ -47,4 +55,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.get("/")
 async def home(request: Request):
+    """
+    Handles the root endpoint and returns the index.html template.
+    """
     return templates.TemplateResponse("index.html", {"request": request})
