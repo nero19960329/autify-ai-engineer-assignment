@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.database import get_db
+from src.logger import logger
 from src import crud, schemas
 
 router = APIRouter(prefix="/snippets", tags=["snippets"])
@@ -28,6 +29,7 @@ async def create_snippet(
 async def get_snippet(snippet_id: int, db: Session = Depends(get_db)):
     db_snippet = crud.get_snippet(db, snippet_id)
     if not db_snippet:
+        logger.warning(f"Snippet not found: {snippet_id}")
         raise HTTPException(status_code=404, detail="Snippet not found")
     return db_snippet
 
@@ -38,6 +40,7 @@ async def update_snippet(
 ):
     db_snippet = crud.update_snippet(db, snippet_id, snippet_data)
     if not db_snippet:
+        logger.warning(f"Snippet not found: {snippet_id}")
         raise HTTPException(status_code=404, detail="Snippet not found")
     return db_snippet
 
@@ -45,4 +48,5 @@ async def update_snippet(
 @router.delete("/{snippet_id}", status_code=204)
 async def delete_snippet(snippet_id: int, db: Session = Depends(get_db)):
     if not crud.delete_snippet(db, snippet_id):
+        logger.warning(f"Snippet not found: {snippet_id}")
         raise HTTPException(status_code=404, detail="Snippet not found")
