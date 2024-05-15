@@ -36,4 +36,4 @@ exclude_patterns = []
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
-html_baseurl = 'https://nero19960329.github.io/autify-ai-engineer-assignment'
+html_baseurl = 'https://nero19960329.github.io/code-snippet-generator/'
